@@ -1,9 +1,8 @@
 # BudgetBuddy
 Mobile application to help users keep track of their precious finances
 
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-
 # Getting Started
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
 >**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
@@ -72,6 +71,11 @@ You've successfully run and modified your React Native App. :partying_face:
 If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
 # Learn More
+
+### Created via
+```bash
+npx @react-native-community/cli@latest init Budgetbuddy --version 0.76.0
+```
 
 To learn more about React Native, take a look at the following resources:
 
