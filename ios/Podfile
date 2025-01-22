@@ -23,6 +23,9 @@ target 'BudgetBuddy' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
+  # IonIcons
+  # pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
   target 'BudgetBuddyTests' do
     inherit! :complete
     # Pods for testing
