@@ -43,9 +43,8 @@ function BudgetCategoryCard({}: BudgetCategoryCardProps): React.JSX.Element {
         ? (
           <>
             {subCategories.map((subCategory, index) => (
-              <View>
+              <View key={index}>
                 <TouchableOpacity 
-                  key={index} 
                   style={styles.subCategoryContainer}
                   onPress={() => console.log(`${subCategory.name} Pressed!`)}
                 >
@@ -75,7 +74,7 @@ function BudgetCategoryCard({}: BudgetCategoryCardProps): React.JSX.Element {
       {/* Add Category */}
       <TouchableOpacity 
         style={styles.addCategoryContainer}
-        onPress={() => setIsVisible(!isVisible)}  
+        onPress={() => setIsVisible(true)}  
       >
         <View style={[styles.iconCircle, {backgroundColor: colors.empty,}]}>
           <Icon

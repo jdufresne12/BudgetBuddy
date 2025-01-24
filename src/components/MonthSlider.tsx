@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     monthContainer: {
         flexDirection: 'row',
         height: 50,
-        width: '80%',
+        width: '85%',
         borderRadius: 20,
         backgroundColor: 'white',
         ...Platform.select({
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.bold,
         fontSize: typography.sizes.header,
-        color: colors.primary,
+        color: colors.black,
     }
 });
 
