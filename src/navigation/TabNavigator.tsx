@@ -2,11 +2,11 @@ import React from 'react';
 import { Text } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { RootTabParamList } from './types';
-import colors from '../assets/colors.ts';
+import { colors } from '../assets/theme.ts';
 import Icon from '@react-native-vector-icons/ionicons';
-import OverviewScreen from '../screens/OverviewScreen';
-import BudgetScreen from '../screens/BudgetScreen';
-import AccountScreen from '../screens/AccountScreen';
+import OverviewTabScreen from '../screens/OverviewTabScreen.tsx';
+import BudgetTabScreen from '../screens/BudgetTabScreen.tsx';
+import AccountTabScreen from '../screens/AccountTabScreen.tsx';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -35,8 +35,8 @@ export const TabNavigator = () => (
               },
         })}
     >
-        <Tab.Screen name="Overview" component={OverviewScreen}/>
-        <Tab.Screen name="Budget" component={BudgetScreen}/>
-        <Tab.Screen name="Account" component={AccountScreen}/>
+        <Tab.Screen name="Overview" component={OverviewTabScreen}/>
+        <Tab.Screen name="Budget" component={BudgetTabScreen}/>
+        <Tab.Screen name="Account" component={AccountTabScreen}/>
     </Tab.Navigator>
 );

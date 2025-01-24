@@ -8,11 +8,11 @@ import {
     useColorScheme,
     View                              
 } from "react-native";
-import colors from '../assets/colors.ts';
+import {colors, typography} from '../assets/theme.ts';
 
 
 
-function AccountScreen(): React.JSX.Element {
+function AccountTabScreen(): React.JSX.Element {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>
@@ -35,4 +35,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default AccountScreen;
+export default AccountTabScreen;
