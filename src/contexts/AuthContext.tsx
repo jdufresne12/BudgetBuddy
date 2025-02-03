@@ -1,56 +1,75 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { storage, UserData } from '../utils/storage';
 
 interface AuthContextType {
-    isAuthenticated: boolean;
-    login: (email: string, password: string) => Promise<void>;
-    signup: (email: string, password: string) => Promise<void>;
-    // logout: () => void;
-  }
-  
-  // Create context
-  const AuthContext = createContext<AuthContextType | undefined>(undefined);
-  
-  // Create a provider component that will wrap our app
-  export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // Tracks whether user is logged in
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
-    // Function to handle login
-    const login = async (email: string, password: string) => {
-      try {
-        // Call login API
-        setIsAuthenticated(true);
-      } catch (error) {
-        // Handle login error
+  isAuthenticated: boolean;
+  userData: UserData | null;
+  token: string | null;
+  login: (token: string, user_data: UserData) => Promise<void>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const token = await storage.getToken();
+      console.log("TOKEN:", token)
+      if (typeof token !== 'string') {
+        setIsAuthenticated(false)
+      } else {
+        setIsAuthenticated(true)
       }
-    };
-  
-    const signup = async (email: string, password: string) => {
-      try {
-        // Call signup API
-        setIsAuthenticated(true);
-      } catch (error) {
-        // Handle signup error
-      }
-    };
-  
-    const logout = () => {
-      setIsAuthenticated(false);
-    };
-  
-    // Provide these values to all child components
-    return (
-      <AuthContext.Provider value={{ isAuthenticated, login, signup/*, logout*/ }}>
-        {children}
-      </AuthContext.Provider>
-    );
-  };
-  
-  // Custom hook to easily access auth context
-  export const useAuth = () => {
-    const context = useContext(AuthContext);
-    if (context === undefined) {
-      throw new Error('useAuth must be used within an AuthProvider');
     }
-    return context;
+
+    checkAuth().catch(console.error);
+  }, [])
+
+  const login = async (token: string, user_data: UserData) => {
+    try {
+      await storage.setToken(token);
+      await storage.setUserData(user_data);
+
+      setIsAuthenticated(true);
+      setUserData(user_data);
+      setToken(token);
+    } catch (error) {
+      console.error('Login error:', error);
+      await storage.clearAll();
+      setToken(null);
+      setUserData(null);
+      setIsAuthenticated(false);
+      throw error;
+    }
   };
+
+  const logout = async () => {
+    try {
+      await storage.clearAll();
+      setUserData(null);
+      setIsAuthenticated(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, userData, token, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Custom hook to easily access auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

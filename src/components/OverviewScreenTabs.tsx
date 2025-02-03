@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, TouchableOpacity, StyleSheet, Platform} from 'react-native';
-import {typography} from '../assets/theme';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { typography } from '../assets/theme';
 
 interface OverviewScreenTabsProps {
-    activeTab: 'overview' | 'transactions';
-    setActiveTab: React.Dispatch<React.SetStateAction<'overview' | 'transactions'>>;
-  }
+  activeTab: 'overview' | 'transactions';
+  setActiveTab: React.Dispatch<React.SetStateAction<'overview' | 'transactions'>>;
+}
 
 const OveriewScreenTabs = ({ activeTab, setActiveTab }: OverviewScreenTabsProps) => {
 
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
       android: {
         elevation: 5,
       },
-  }),
+    }),
   },
   activeIndicator: {
     position: 'absolute',
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
       android: {
         elevation: 5,
       },
-  }),
+    }),
   },
 });
 

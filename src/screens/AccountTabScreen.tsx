@@ -1,24 +1,40 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     SafeAreaView,
     ScrollView,
     StatusBar,
     StyleSheet,
     Text,
-    useColorScheme,
-    View                              
+    TouchableOpacity,
+    View
 } from "react-native";
-import {colors, typography} from '../assets/theme.ts';
-
-
+import { colors, typography } from '../assets/theme.ts';
+import { useAuth } from "../contexts/AuthContext.tsx";
+import { useLoading } from "../contexts/LoadingContext.tsx";
 
 function AccountTabScreen(): React.JSX.Element {
+    const { logout: contextLogout } = useAuth();
+    const { setIsLoading } = useLoading();
+
+    const handleSignOut = async () => {
+        setIsLoading(true);
+        try {
+            await contextLogout();
+        } catch {
+            console.log('Failed to logout')
+        }
+        setIsLoading(false);
+    }
+
     return (
-        <View style={styles.container}>
+        <TouchableOpacity
+            style={styles.container}
+            onPress={handleSignOut}
+        >
             <Text style={styles.text}>
-                Account Screen
+                Account Screen / SIGNOUT
             </Text>
-        </View>
+        </TouchableOpacity>
     );
 }
 

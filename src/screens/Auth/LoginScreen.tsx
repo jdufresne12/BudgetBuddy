@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
+    Alert,
     Platform,
     StyleSheet,
     Text,
@@ -12,6 +13,9 @@ import { AuthStackParamList } from '../../navigation/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { colors, typography } from '../../assets/theme';
 import Icon from '@react-native-vector-icons/ionicons';
+import { authApi } from '../../api/services/auth';
+import { useAuth } from '../../contexts/AuthContext';
+import { useLoading } from '../../contexts/LoadingContext';
 
 type AuthNavigationProp = NativeStackNavigationProp<
     AuthStackParamList,
@@ -19,33 +23,61 @@ type AuthNavigationProp = NativeStackNavigationProp<
 >;
 
 const LoginScreen = () => {
+    const { setIsLoading } = useLoading();
     const navigation = useNavigation<AuthNavigationProp>();
 
-    const [username, setUsername] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [emailError, setEmailError] = useState<boolean>(false);
     const [password, setPassword] = useState<string>('');
+    const [passwordError, setPasswordError] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const { login: contextLogin } = useAuth();
 
-    const handleLoginPress = () => {
-        /*
-            STEP 1: Validate Username and Password
-            STEP 2: Call login api
-            STEP 3: Obtain response, determine if successful or not 
-        */
-        console.log('username', username)
-        console.log('password', password)
+    const handleLoginPress = async () => {
+        let isValid = true;
+        setEmailError(false);
+        setPasswordError(false);
+
+        if (email.trim() === '') {
+            setEmailError(true);
+            isValid = false;
+        }
+        if (password.trim() === '') {
+            setPasswordError(true);
+            isValid = false;
+        }
+
+        if (!isValid) return
+        try {
+            setIsLoading(true);
+            const response = await authApi.login({ email, password });
+            console.log("here")
+            await contextLogin(response.access_token, response.user_data);
+        } catch (error) {
+            const errorMessage = error instanceof Error
+                ? error.message
+                : 'Please check your credentials and try again';
+
+            Alert.alert(
+                'Login Failed',
+                errorMessage
+            );
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <View style={styles.container}>
             <TouchableOpacity
                 style={styles.backButtonContainer}
-                onPress={() => navigation.navigate('Welcome')}
+                onPress={() => navigation.goBack()}
             >
-                <Icon name="arrow-back-outline" size={40} color={colors.white} />
+                <Icon name="arrow-back-outline" size={40} color={colors.primary} />
             </TouchableOpacity>
 
             <View style={styles.logoContainer}>
-                <Icon name="logo-bitcoin" size={125} color={colors.primary} />
+                <Icon name="logo-bitcoin" size={125} color={colors.secondary} />
             </View>
 
             <View style={styles.textContainer}>
@@ -54,7 +86,12 @@ const LoginScreen = () => {
             </View>
 
             <View style={styles.formContainer}>
-                <View style={styles.inputContainer}>
+                <View
+                    style={[
+                        styles.inputContainer,
+                        emailError ? { borderColor: colors.error_red } : null
+                    ]}
+                >
                     <Icon
                         name="person-outline"
                         size={20}
@@ -63,15 +100,20 @@ const LoginScreen = () => {
                     />
                     <TextInput
                         style={styles.input}
-                        placeholder="Username"
-                        value={username}
-                        onChangeText={setUsername}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
                 </View>
 
-                <View style={styles.inputContainer}>
+                <View
+                    style={[
+                        styles.inputContainer,
+                        passwordError ? { borderColor: colors.error_red } : null
+                    ]}
+                >
                     <Icon
                         name="lock-closed-outline"
                         size={20}
@@ -121,16 +163,16 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         alignItems: 'center',
-        backgroundColor: colors.primary,
+        backgroundColor: colors.secondary,
     },
     logoContainer: {
-        marginTop: 30,
+        marginTop: 12,
         width: 175,
         height: 175,
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 125,
-        backgroundColor: colors.secondary,
+        backgroundColor: colors.primary,
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
@@ -156,22 +198,21 @@ const styles = StyleSheet.create({
         marginBottom: 40,
     },
     welcomeText: {
-        marginTop: 100,
+        marginTop: 90,
         marginBottom: 5,
         letterSpacing: 0.5,
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.heavy,
         fontSize: typography.sizes.moneyLarge,
-        color: colors.white,
+        color: colors.primary,
     },
     tagline: {
-        marginTop: 5,
         marginBottom: 5,
         letterSpacing: 0.2,
         fontFamily: typography.fontFamily,
-        fontWeight: typography.fontWeights.bold,
-        fontSize: typography.sizes.body,
-        color: colors.white,
+        fontWeight: typography.fontWeights.regular,
+        fontSize: typography.sizes.title,
+        color: colors.primary,
     },
     buttonContainer: {
         alignSelf: 'center',
@@ -180,15 +221,15 @@ const styles = StyleSheet.create({
         gap: 10,
     },
     loginButton: {
-        backgroundColor: 'transparent',
+        backgroundColor: colors.primary,
         padding: 15,
         borderRadius: 25,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#fff',
+        borderColor: colors.white,
     },
     loginButtonText: {
-        color: '#fff',
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -199,11 +240,13 @@ const styles = StyleSheet.create({
     inputContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
-        borderRadius: 25,
+        height: 50,
         marginBottom: 15,
         paddingHorizontal: 15,
-        height: 50,
+        borderRadius: 25,
+        borderWidth: 2,
+        borderColor: colors.white,
+        backgroundColor: colors.white,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -231,10 +274,10 @@ const styles = StyleSheet.create({
         borderRadius: 25,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#fff',
+        borderColor: colors.white,
     },
     signupButtonText: {
-        color: '#fff',
+        color: colors.white,
         fontSize: 16,
         fontWeight: 'bold',
     },
@@ -243,7 +286,7 @@ const styles = StyleSheet.create({
         marginTop: 15,
     },
     forgotPasswordText: {
-        color: '#fff',
+        color: colors.inactive,
         fontSize: 14,
     },
 });

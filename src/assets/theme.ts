@@ -1,7 +1,7 @@
 // src/theme/typography.js
 import { Platform } from 'react-native';
 
-export const typography:any = {
+export const typography: any = {
   fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
   fontWeights: {
     tiny: '300',
@@ -20,11 +20,12 @@ export const typography:any = {
   }
 };
 
-export const colors:any ={
-    primary: '#32cbed',
-    secondary: '#e9f5f9',
-    white: '#FFFFFF',
-    black: '#080808',
-    inactive: '#7d7d7d',
-    empty: '#e4e4e4',
+export const colors: any = {
+  primary: '#32cbed',
+  secondary: '#e9f5f9',
+  white: '#FFFFFF',
+  black: '#080808',
+  inactive: '#7d7d7d',
+  empty: '#e4e4e4',
+  error_red: '#fc212f',
 };
