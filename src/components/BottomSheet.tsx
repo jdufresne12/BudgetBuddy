@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, Platform, Modal, StyleSheet, View } from 'react-native';
+import { Animated, Platform, Modal, StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Dimensions } from 'react-native';
 import { colors } from '../assets/theme';
 
 interface BottomSheetProps {
-    visible: boolean,
-    onClose: any,
-    children: any
+  visible: boolean,
+  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  onClose: any,
+  children: any
 }
 
-const BottomSheet = ({ visible, onClose, children }: BottomSheetProps) => {
+const BottomSheet = ({ visible, setVisible, onClose, children }: BottomSheetProps) => {
   const [animation] = useState(new Animated.Value(0));
 
   useEffect(() => {
@@ -32,16 +33,26 @@ const BottomSheet = ({ visible, onClose, children }: BottomSheetProps) => {
       animationType="fade"
       onRequestClose={onClose}
     >
-      <View style={styles.overlay}>
-        <Animated.View 
+      <TouchableOpacity
+        style={styles.overlay}
+        activeOpacity={1}
+        onPress={() => setVisible(false)}
+      >
+        <Animated.View
           style={[
             styles.bottomSheet,
             { transform: [{ translateY }] }
           ]}
         >
-          {children}
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+            style={styles.contentContainer}
+          >
+            {children}
+          </TouchableOpacity>
         </Animated.View>
-      </View>
+      </TouchableOpacity>
     </Modal>
   );
 };
@@ -54,10 +65,11 @@ const styles = StyleSheet.create({
   },
   bottomSheet: {
     backgroundColor: colors.white,
-    padding: 20,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    minHeight: Dimensions.get('window').height - 75,
+  },
+  contentContainer: {
+    padding: 20,
   }
 });
 

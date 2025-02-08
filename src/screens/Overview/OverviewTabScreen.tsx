@@ -7,10 +7,10 @@ import {
     Text,
     View
 } from "react-native";
-import { colors } from '../assets/theme.ts'
-import OveriewScreenTabs from "../components/OverviewScreenTabs.tsx";
-import OverviewScreen from "./Overview/OverviewScreen.tsx";
-import TransactionScreen from "./Overview/TransactionScreen.tsx";
+import { colors } from '../../assets/theme.ts'
+import OveriewScreenTabs from "../../components/OverviewScreenTabs.tsx";
+import OverviewScreen from "../Overview/OverviewScreen.tsx";
+import TransactionScreen from "../Overview/TransactionScreen.tsx";
 
 function OverviewTabScreen(): React.JSX.Element {
     const [activeTab, setActiveTab] = useState<'overview' | 'transactions'>('overview');

@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     Platform,
     StyleSheet,
@@ -11,42 +11,36 @@ import { formatToDollar } from "../utils/textFormatting.ts";
 
 interface ExpensesChartProps {
     remainingBudget: number;
-    setRemainingBudget: React.Dispatch<React.SetStateAction<number>>;
     totalExpenses: number;
-    setTotalExpenses: React.Dispatch<React.SetStateAction<number>>;
     circleProgress: number;
-    setCircleProgress: React.Dispatch<React.SetStateAction<number>>;
 }
 
 function ExpensesChart({
-        remainingBudget,
-        setRemainingBudget,
-        totalExpenses,
-        setTotalExpenses,
-        circleProgress,
-        setCircleProgress,
-    }: ExpensesChartProps): React.JSX.Element {
+    remainingBudget,
+    totalExpenses,
+    circleProgress,
+}: ExpensesChartProps): React.JSX.Element {
 
     return (
-      <View style={styles.container}>
-        <View style={styles.circleContainer}>
-            <Progress.Circle 
-                progress={circleProgress} 
-                size={100} 
-                thickness={15} 
-                borderColor="none" 
-                color={colors.primary}
-                unfilledColor={colors.empty}
-                strokeCap="round"
-            />
+        <View style={styles.container}>
+            <View style={styles.circleContainer}>
+                <Progress.Circle
+                    progress={circleProgress}
+                    size={100}
+                    thickness={15}
+                    borderColor="none"
+                    color={colors.primary}
+                    unfilledColor={colors.empty}
+                    strokeCap="round"
+                />
+            </View>
+
+            <View style={styles.expensesContainer}>
+                <Text style={styles.plannedExpensesText}>Total Planned Expenses</Text>
+                <Text style={styles.spentText}>{formatToDollar(totalExpenses)}</Text>
+                <Text style={styles.leftInBudgetText}>{`${formatToDollar(remainingBudget)} left to budget`}</Text>
+            </View>
         </View>
-        
-        <View style={styles.expensesContainer}>
-            <Text style={styles.plannedExpensesText}>Total Planned Expenses</Text>
-            <Text style={styles.spentText}>{formatToDollar(totalExpenses)}</Text>
-            <Text style={styles.leftInBudgetText}>{`${formatToDollar(remainingBudget)} left to budget`}</Text>
-        </View>
-      </View>
     );
 }
 
@@ -55,30 +49,33 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         width: "90%",
-        borderRadius: 10,
-        backgroundColor: 'white',
+        alignSelf: 'center',
+        marginTop: 20,
+        padding: 20,
+        // borderRadius: 10,
+        // backgroundColor: 'white',
         ...Platform.select({
             ios: {
-              shadowColor: '#000',
-              shadowOffset: {
-                width: 0,
-                height: 2,
-              },
-              shadowOpacity: 0.25,
-              shadowRadius: 3.84,
+                shadowColor: '#000',
+                shadowOffset: {
+                    width: 0,
+                    height: 2,
+                },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
             },
             android: {
-              elevation: 5,
+                elevation: 5,
             },
         }),
     },
-    circleContainer:{
+    circleContainer: {
         width: '40%',
         height: "100%",
         justifyContent: 'center',
         alignItems: 'center',
     },
-    expensesContainer:{
+    expensesContainer: {
         justifyContent: 'center',
         width: '60%',
         paddingBottom: 10,

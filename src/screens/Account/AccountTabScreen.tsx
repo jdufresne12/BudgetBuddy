@@ -8,9 +8,9 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
-import { colors, typography } from '../assets/theme.ts';
-import { useAuth } from "../contexts/AuthContext.tsx";
-import { useLoading } from "../contexts/LoadingContext.tsx";
+import { colors, typography } from '../../assets/theme.ts';
+import { useAuth } from "../../contexts/AuthContext.tsx";
+import { useLoading } from "../../contexts/LoadingContext.tsx";
 
 function AccountTabScreen(): React.JSX.Element {
     const { logout: contextLogout } = useAuth();

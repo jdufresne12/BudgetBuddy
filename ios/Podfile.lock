@@ -1638,6 +1638,27 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - RNDateTimePicker (8.2.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.01.01.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-ImageManager
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - RNScreens (4.5.0):
     - DoubleConversion
     - glog
@@ -1798,6 +1819,7 @@ DEPENDENCIES:
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
+  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -1940,6 +1962,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
+  RNDateTimePicker:
+    :path: "../node_modules/@react-native-community/datetimepicker"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNSVG:
@@ -2014,6 +2038,7 @@ SPEC CHECKSUMS:
   ReactCodegen: ff7512e124e3dc1363a4930a209d033354d2042a
   ReactCommon: cde69a75746e8d7131f61c27155ee9dc42117003
   RNCAsyncStorage: 2edc69cf6db9299363a11477668b7f452f2cb4a6
+  RNDateTimePicker: 9ec036a62ad0f5a2d04c1c7829338e87b4e423e7
   RNScreens: 4c7d5710e955dcf72c14a546e29744f9e591370b
   RNSVG: c50d29abf38abbf48ebfc50b6258f81099aeabae
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748

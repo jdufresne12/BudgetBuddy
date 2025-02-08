@@ -28,4 +28,5 @@ export const colors: any = {
   inactive: '#7d7d7d',
   empty: '#e4e4e4',
   error_red: '#fc212f',
+  remove: '#ff4262',
 };

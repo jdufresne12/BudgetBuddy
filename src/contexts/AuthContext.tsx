@@ -18,17 +18,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = await storage.getToken();
-      console.log("TOKEN:", token)
-      if (typeof token !== 'string') {
-        setIsAuthenticated(false)
-      } else {
-        setIsAuthenticated(true)
-      }
-    }
+      try {
+        const [token, storedUserData] = await Promise.all([
+          storage.getToken(),
+          storage.getUserData()
+        ]);
 
-    checkAuth().catch(console.error);
-  }, [])
+        if (typeof token === 'string' && storedUserData) {
+          setToken(token);
+          setUserData(storedUserData);
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+          setToken(null);
+          setUserData(null);
+        }
+      } catch (error) {
+        console.error('Error checking auth state:', error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const login = async (token: string, user_data: UserData) => {
     try {

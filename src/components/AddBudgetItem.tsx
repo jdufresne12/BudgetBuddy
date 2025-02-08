@@ -1,90 +1,85 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Animated,
-    Platform,
-    Modal,
     StyleSheet,
     Text,
+    TextInput,
     TouchableOpacity,
     View,
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ionicons';
-import { Dimensions } from 'react-native';
 import BottomSheet from './BottomSheet';
 import { colors, typography } from '../assets/theme';
 import AmountInput from './AmountInput';
-import { formatToDollar } from '../utils/textFormatting';
 
-interface AddExpenseModalProps {
+interface AddBudgetItemProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AddExpenseModal = ({ isVisible, setIsVisible }: AddExpenseModalProps) => {
-    const [expenseAmount, setExpenseAmount] = useState<number>(0);
-    const [expenseType, setExpenseType] = useState<string>('expense');
+const AddBudgetItem = ({ isVisible, setIsVisible }: AddBudgetItemProps) => {
+    const [amount, setAmount] = useState<number>(0);
+    const [itemType, setItemType] = useState<string>('expense');
+
 
     return (
-        <BottomSheet visible={isVisible} onClose={() => setIsVisible(false)}>
-            {/* Header */}
+        <BottomSheet visible={isVisible} setVisible={setIsVisible} onClose={() => setIsVisible(false)}>
             <View style={styles.container}>
                 <TouchableOpacity onPress={() => setIsVisible(false)}>
                     <Icon name="close" size={40} color={colors.empty} />
                 </TouchableOpacity>
-                <Text style={styles.budgetExpenseHeader}>Budget Expense</Text>
+                <Text style={styles.budgetExpenseHeader}>Budget Item</Text>
             </View>
 
-            {/* $ 100 */}
             <View style={{ alignSelf: 'center', marginTop: 10 }}>
                 <AmountInput
-                    number={String(expenseAmount)}
-                    setNumber={setExpenseAmount}
+                    number={String(amount)}
+                    setNumber={setAmount}
                 />
             </View>
 
-            {/* Expense/Income */}
-            <View style={styles.expenseTypeContainer}>
+            <View style={styles.itemTypeContainer}>
                 <TouchableOpacity
                     style={[
-                        styles.expenseType,
-                        expenseType === 'expense' ? { backgroundColor: colors.empty } : null,
+                        styles.itemType,
+                        itemType === 'expense' ? { backgroundColor: colors.empty } : null,
                     ]}
-                    onPress={() => setExpenseType('expense')}>
-                    <Text style={styles.typeExpenseText}>EXPENSE</Text>
+                    onPress={() => setItemType('expense')}>
+                    <Text style={styles.itemTypeText}>EXPENSE</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                     style={[
-                        styles.expenseType,
-                        expenseType === 'income' ? { backgroundColor: colors.empty } : null,
+                        styles.itemType,
+                        itemType === 'income' ? { backgroundColor: colors.empty } : null,
                     ]}
-                    onPress={() => setExpenseType('income')}>
-                    <Text style={styles.typeExpenseText}>INCOME</Text>
+                    onPress={() => setItemType('income')}>
+                    <Text style={styles.itemTypeText}>INCOME</Text>
                 </TouchableOpacity>
             </View>
 
             <View style={styles.lineSeparator} />
 
-            {/* Category Selection */}
             <TouchableOpacity
                 style={styles.categoryContainer}
-                onPress={() => console.log(`Category Pressed!`)}
+                onPress={() => console.log(`Name Pressed!`)}
             >
                 <View style={styles.iconCircle}>
                     <Icon name='folder-sharp' size={20} color={colors.white} />
                 </View>
-                <Text style={styles.categoryText}> Category:  
-                    <Text style={styles.categoryNameText}> Miscellaneous</Text>
+                <Text style={styles.categoryText}> Name:
+                    <TextInput
+                        style={styles.categoryNameText}
+
+                    />
                 </Text>
             </TouchableOpacity>
 
             <View style={styles.lineSeparator} />
 
-            {/* Recurring (weekly, bi-weelkly, monthly, yearly) */}
             <TouchableOpacity
                 style={styles.categoryContainer}
                 onPress={() => console.log(`Recurring Pressed!`)}
             >
-                <View style={[styles.iconCircle, {backgroundColor: colors.white, paddingTop: 0}]}>
+                <View style={[styles.iconCircle, { backgroundColor: colors.white, paddingTop: 0 }]}>
                     <Icon name='calendar-outline' size={35} color={colors.black} />
                 </View>
                 <Text style={styles.categoryText}> No end date</Text>
@@ -92,7 +87,6 @@ const AddExpenseModal = ({ isVisible, setIsVisible }: AddExpenseModalProps) => {
 
             <View style={styles.lineSeparator} />
 
-            {/* Expense Type */}
             <TouchableOpacity
                 style={styles.expenseContainer}
                 onPress={() => console.log(`Expense Type Pressed!`)}
@@ -100,7 +94,7 @@ const AddExpenseModal = ({ isVisible, setIsVisible }: AddExpenseModalProps) => {
                 <View style={styles.expense}>
                     <Text style={styles.categoryText}> Expense type</Text>
                 </View>
-                <Text style={[styles.categoryText, {color: colors.black, letterSpacing: 1.0}]}> VARIABLE EXPENSE</Text>
+                <Text style={[styles.categoryText, { color: colors.black, letterSpacing: 1.0 }]}> VARIABLE EXPENSE</Text>
             </TouchableOpacity>
 
             <View style={styles.lineSeparator} />
@@ -113,7 +107,6 @@ const AddExpenseModal = ({ isVisible, setIsVisible }: AddExpenseModalProps) => {
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        height: '5%',
         alignItems: 'center',
     },
     budgetExpenseHeader: {
@@ -123,13 +116,13 @@ const styles = StyleSheet.create({
         fontWeight: typography.fontWeights.tiny,
         fontSize: typography.sizes.title,
     },
-    typeExpenseText: {
+    itemTypeText: {
         letterSpacing: 1,
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.regular,
         fontSize: typography.sizes.small,
     },
-    expenseTypeContainer: {
+    itemTypeContainer: {
         flexDirection: 'row',
         height: 40,
         width: '50%',
@@ -137,7 +130,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignSelf: 'center',
     },
-    expenseType: {
+    itemType: {
         width: '50%',
         marginTop: 5,
         justifyContent: 'center',
@@ -195,4 +188,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddExpenseModal;
+export default AddBudgetItem;

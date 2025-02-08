@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     Platform,
     StyleSheet,
@@ -14,56 +14,56 @@ interface MonthSliderProps {
     setMonth: React.Dispatch<React.SetStateAction<number>>;
     year: number;
     setYear: React.Dispatch<React.SetStateAction<number>>;
-  }
+}
 
 function MonthSlider({ month, setMonth, year, setYear }: MonthSliderProps): React.JSX.Element {
     const MONTHS: string[] = [
-        'January', 'February', 'March', 'April', 'May', 'June', 
+        'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
     ];
-    
+
     function backOneMonth() {
-        if(month === 0){ 
+        if (month === 0) {
             // December <- January
             setMonth(11);
             setYear(year - 1);
-        } else 
+        } else
             setMonth(month - 1);
     }
     function upOneMonth() {
-        if(month === 11){ 
+        if (month === 11) {
             // December -> January
             setMonth(0);
             setYear(year + 1);
-        } else 
+        } else
             setMonth(month + 1);
     }
 
     return (
-      <View style={styles.container}>
-        <View style={styles.monthContainer}>
-            {/* Left Chevron */}
-            <TouchableOpacity 
-                style={styles.leftChevron}
-                onPress={() => backOneMonth()}
-            >
-                <Icon name={"chevron-back"} size={25} color={colors.primary} />
-            </TouchableOpacity>
+        <View style={styles.container}>
+            <View style={styles.monthContainer}>
+                {/* Left Chevron */}
+                <TouchableOpacity
+                    style={styles.leftChevron}
+                    onPress={() => backOneMonth()}
+                >
+                    <Icon name={"chevron-back"} size={25} color={colors.primary} />
+                </TouchableOpacity>
 
-            {/* Month */}
-            <View style={styles.month}>
-                <Text style={styles.monthText}>{`${MONTHS[month]}   ${year}`}</Text>
-            </View>
+                {/* Month */}
+                <View style={styles.month}>
+                    <Text style={styles.monthText}>{`${MONTHS[month]}   ${year}`}</Text>
+                </View>
 
-            {/* Right Chevron */}
+                {/* Right Chevron */}
                 <TouchableOpacity
                     style={styles.rightChevron}
                     onPress={() => upOneMonth()}
                 >
                     <Icon name={"chevron-forward"} size={25} color={colors.primary} />
-                </TouchableOpacity> 
+                </TouchableOpacity>
+            </View>
         </View>
-      </View>
     );
 }
 
@@ -76,22 +76,22 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         paddingBottom: 25,
         gap: 25,
-      },
+    },
     monthContainer: {
         flexDirection: 'row',
         height: 50,
         width: '85%',
-        borderRadius: 20,
+        borderRadius: 30,
         backgroundColor: 'white',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',
                 shadowOffset: {
-                width: 0,
-                height: 2,
+                    width: 0,
+                    height: 2,
                 },
-                shadowOpacity: 0.25,
-                shadowRadius: 3.84,
+                shadowOpacity: 0.20,
+                shadowRadius: 3.5,
             },
             android: {
                 elevation: 5,
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
     monthText: {
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.bold,
-        fontSize: typography.sizes.header,
+        fontSize: typography.sizes.title,
         color: colors.black,
     }
 });

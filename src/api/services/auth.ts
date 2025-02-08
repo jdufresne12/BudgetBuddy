@@ -1,4 +1,5 @@
 import apiClient from '../client';
+import { handleApiError } from '../config';
 
 interface LoginCredentials {
     email: string;
@@ -20,10 +21,9 @@ export const authApi = {
     login: async (credentials: LoginCredentials) => {
         try {
             const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-            console.log("FAILED 1")
+            console.log(response.data.access_token)
             return response.data;
         } catch (error) {
-            console.log("FAILED 2")
             handleApiError(error);
             throw error;
         }
@@ -44,15 +44,5 @@ export const authApi = {
         } catch (error) {
             throw handleApiError(error);
         }
-    }
-};
-
-const handleApiError = (error: any): never => {  // Note the return type
-    if (error.response) {
-        throw new Error(error.response.data.detail || 'An error occurred');
-    } else if (error.request) {
-        throw new Error('No response from server');
-    } else {
-        throw new Error(error.message || 'An error occurred');
     }
 };
