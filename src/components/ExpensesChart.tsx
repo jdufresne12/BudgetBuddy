@@ -48,12 +48,13 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: 'row',
-        width: "90%",
+        width: "85%",
         alignSelf: 'center',
         marginTop: 20,
+        marginBottom: 10,
         padding: 20,
-        // borderRadius: 10,
-        // backgroundColor: 'white',
+        borderRadius: 10,
+        backgroundColor: 'white',
         ...Platform.select({
             ios: {
                 shadowColor: '#000',

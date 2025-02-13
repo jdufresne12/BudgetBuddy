@@ -13,6 +13,7 @@ import { typography, colors } from '../assets/theme.ts';
 import { useAuth } from '../contexts/AuthContext.tsx';
 import { sectionAPI, SectionData, CreateSection } from '../api/services/section.ts';
 import { BudgetState } from '../screens/Budget/BudgetTabScreen.tsx';
+import { getCurrentDate } from '../utils/textFormatting.ts';
 
 interface AddSectionProps {
     setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
@@ -22,10 +23,6 @@ function AddSection({ setBudgetState }: AddSectionProps): React.JSX.Element {
     const { userData } = useAuth();
 
     const [newSectionName, setNewSectionName] = useState<string>("");
-
-    function getCurrentDate() {
-        return new Date().toISOString().split("T")[0]
-    }
 
     const handleBlur = async () => {
         if (newSectionName.trim() !== "") {

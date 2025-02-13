@@ -1,21 +1,13 @@
 import apiClient from '../client';
 import { handleApiError } from '../config';
+import { BudgetItem } from './budget';
 
 export interface SectionData {
     section_id: number;
     name: string;
     start_date: string;
     end_date: string | null;
-    // budgetItems: BudgetItem[];
-}
-
-export interface BudgetItem {
-    item_id: number;
-    name: string;
-    amount: number;
-    start_date: string;
-    end_date: string | null;
-    transactions: Transaction[];
+    budgetItems: BudgetItem[];
 }
 
 export interface Transaction {

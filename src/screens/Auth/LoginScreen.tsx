@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {
     Alert,
+    Keyboard,
+    KeyboardAvoidingView,
     Platform,
+    ScrollView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
+    TouchableWithoutFeedback,
     View,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -66,94 +70,105 @@ const LoginScreen = () => {
             setIsLoading(false);
         }
     };
-
     return (
-        <View style={styles.container}>
-            <TouchableOpacity
-                style={styles.backButtonContainer}
-                onPress={() => navigation.goBack()}
-            >
-                <Icon name="arrow-back-outline" size={40} color={colors.primary} />
-            </TouchableOpacity>
-
-            <View style={styles.logoContainer}>
-                <Icon name="logo-bitcoin" size={125} color={colors.secondary} />
-            </View>
-
-            <View style={styles.textContainer}>
-                <Text style={styles.welcomeText}>Welcome!</Text>
-                <Text style={styles.tagline}>Let's get to budgeting</Text>
-            </View>
-
-            <View style={styles.formContainer}>
-                <View
-                    style={[
-                        styles.inputContainer,
-                        emailError ? { borderColor: colors.error_red } : null
-                    ]}
+        <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'height' : 'height'}
+            style={{ flex: 1 }}
+        >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} style={{ backgroundColor: colors.white }}>
+                <ScrollView
+                    contentContainerStyle={{ flexGrow: 1 }}
+                    keyboardShouldPersistTaps="handled"
                 >
-                    <Icon
-                        name="person-outline"
-                        size={20}
-                        color={colors.inactive}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Email"
-                        value={email}
-                        onChangeText={setEmail}
-                        autoCapitalize="none"
-                        autoCorrect={false}
-                    />
-                </View>
+                    <View style={styles.container}>
+                        <TouchableOpacity
+                            style={styles.backButtonContainer}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <Icon name="arrow-back-outline" size={40} color={colors.primary} />
+                        </TouchableOpacity>
 
-                <View
-                    style={[
-                        styles.inputContainer,
-                        passwordError ? { borderColor: colors.error_red } : null
-                    ]}
-                >
-                    <Icon
-                        name="lock-closed-outline"
-                        size={20}
-                        color={colors.inactive}
-                        style={styles.inputIcon}
-                    />
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Password"
-                        value={password}
-                        onChangeText={setPassword}
-                        secureTextEntry={!showPassword}
-                        autoCapitalize="none"
-                    />
-                    <TouchableOpacity
-                        onPress={() => setShowPassword(!showPassword)}
-                        style={styles.eyeIcon}>
-                        <Icon
-                            name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                            size={20}
-                            color={colors.inactive}
-                        />
-                    </TouchableOpacity>
-                </View>
+                        <View style={styles.logoContainer}>
+                            <Icon name="logo-bitcoin" size={125} color={colors.secondary} />
+                        </View>
 
-                <View style={styles.buttonContainer}>
-                    <TouchableOpacity
-                        style={styles.loginButton}
-                        onPress={handleLoginPress}>
-                        <Text style={styles.loginButtonText}>Login</Text>
-                    </TouchableOpacity>
-                </View>
+                        <View style={styles.textContainer}>
+                            <Text style={styles.welcomeText}>Welcome!</Text>
+                            <Text style={styles.tagline}>Let's get to budgeting</Text>
+                        </View>
 
-                <TouchableOpacity
-                    style={styles.forgotPassword}
-                    onPress={() => console.log('- NEED TO IMPLEMENT FORGOT PASSWORD -')}>
-                    <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
+                        <View style={styles.formContainer}>
+                            <View
+                                style={[
+                                    styles.inputContainer,
+                                    emailError ? { borderColor: colors.error_red } : null
+                                ]}
+                            >
+                                <Icon
+                                    name="person-outline"
+                                    size={20}
+                                    color={colors.inactive}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Email"
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                    autoCorrect={false}
+                                />
+                            </View>
+
+                            <View
+                                style={[
+                                    styles.inputContainer,
+                                    passwordError ? { borderColor: colors.error_red } : null
+                                ]}
+                            >
+                                <Icon
+                                    name="lock-closed-outline"
+                                    size={20}
+                                    color={colors.inactive}
+                                    style={styles.inputIcon}
+                                />
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Password"
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    autoCapitalize="none"
+                                />
+                                <TouchableOpacity
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    style={styles.eyeIcon}>
+                                    <Icon
+                                        name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                                        size={20}
+                                        color={colors.inactive}
+                                    />
+                                </TouchableOpacity>
+                            </View>
+
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity
+                                    style={styles.loginButton}
+                                    onPress={handleLoginPress}>
+                                    <Text style={styles.loginButtonText}>Login</Text>
+                                </TouchableOpacity>
+                            </View>
+
+                            <TouchableOpacity
+                                style={styles.forgotPassword}
+                                onPress={() => console.log('- NEED TO IMPLEMENT FORGOT PASSWORD -')}>
+                                <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </ScrollView>
+            </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
     );
 };
 

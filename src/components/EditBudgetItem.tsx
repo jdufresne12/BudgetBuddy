@@ -12,20 +12,21 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { colors, typography } from '../assets/theme';
 import { getCurrentDate, isValidDateFormat } from '../utils/textFormatting';
 import { useAuth } from '../contexts/AuthContext';
-import { budgetAPI } from '../api/services/budget';
+import { budgetAPI, DeleteBudgetItemData } from '../api/services/budget';
 
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
 import { CreateBudgetItemData, BudgetItem } from '../api/services/budget';
 
-interface AddBudgetItemProps {
+interface EditBudgetItemProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
     section_id: number;
-    handleAddedItem: () => void;
+    budgetItem: BudgetItem | null;
+    handleUpdateItem: () => void;
 }
 
-const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }: AddBudgetItemProps) => {
+const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handleUpdateItem }: EditBudgetItemProps) => {
     const { userData } = useAuth();
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
@@ -34,6 +35,15 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
     const [endDate, setEndDate] = useState<string | null>(null);
     const [endDateError, setEndDateError] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (budgetItem) {
+            setAmount(budgetItem.amount);
+            setItemType(budgetItem.type);
+            setName(budgetItem.name);
+            setEndDate(budgetItem.end_date);
+        }
+    }, [budgetItem]);
 
     const handleCancel = async () => {
         await resetData();
@@ -47,14 +57,6 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
         setEndDate(null);
         setNameError(null);
         setEndDateError(null);
-    };
-
-    const showDatePicker = () => { setDatePickerVisibility(true) };
-    const hideDatePicker = () => { setDatePickerVisibility(false) };
-    const handleConfirm = (date: Date) => {
-        const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
-        setEndDate(formattedDate);
-        hideDatePicker();
     };
 
     const handleSetName = (text: string) => {
@@ -75,7 +77,7 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
         setEndDateError(null);
     };
 
-    const handleAddItem = async () => {
+    const handleUpdate = async () => {
         let isValid = true;
 
         if (name === null || name === '') {
@@ -92,28 +94,59 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
         } else
             setEndDateError(null)
 
-        if (isValid) {
+        if (isValid && budgetItem) {
             try {
-                const data: CreateBudgetItemData = {
-                    "section_id": section_id,
-                    "user_id": userData?.user_id,
-                    "name": name,
-                    "amount": amount,
-                    "type": itemType,
-                    "start_date": getCurrentDate(),
-                    "end_date": endDate
-                }
-                const response = await budgetAPI.createBudgetItem(data);
+                const data: BudgetItem = {
+                    item_id: budgetItem.item_id,
+                    section_id: section_id,
+                    user_id: userData?.user_id,
+                    name: name,
+                    amount: amount,
+                    type: itemType,
+                    start_date: budgetItem.start_date,
+                    end_date: endDate
+                };
+
+                const response = await budgetAPI.updateBudgetItem(data);
                 if (response) {
-                    handleAddedItem();
+                    handleUpdateItem();
                 }
             } catch (error) {
                 console.error(error);
             } finally {
-                setIsVisible(false)
+                setIsVisible(false);
                 await resetData();
             }
         }
+    };
+
+    const handleDelete = async () => {
+        if (budgetItem) {
+            try {
+                const data: DeleteBudgetItemData = {
+                    item_id: budgetItem.item_id,
+                    user_id: userData?.user_id,
+                    section_id: section_id
+                };
+                const response = await budgetAPI.deleteBudgetItem(data);
+                if (response) {
+                    handleUpdateItem();
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setIsVisible(false);
+                await resetData();
+            }
+        }
+    };
+
+    const showDatePicker = () => { setDatePickerVisibility(true) };
+    const hideDatePicker = () => { setDatePickerVisibility(false) };
+    const handleConfirm = (date: Date) => {
+        const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
+        setEndDate(formattedDate);
+        hideDatePicker();
     };
 
     return (
@@ -163,6 +196,7 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
                         placeholder='Name:'
                         placeholderTextColor={colors.inactive}
                         onChangeText={handleSetName}
+                        value={name}
                     />
                 </View>
                 {nameError && (
@@ -191,12 +225,21 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
 
                 <View style={styles.lineSeparator} />
 
-                <TouchableOpacity
-                    style={styles.addButton}
-                    onPress={handleAddItem}
-                >
-                    <Text style={styles.addButtonText}>Add</Text>
-                </TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity
+                        style={[styles.addButton, styles.updateButton]}
+                        onPress={handleUpdate}
+                    >
+                        <Text style={styles.addButtonText}>Update</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.addButton, styles.deleteButton]}
+                        onPress={handleDelete}
+                    >
+                        <Text style={styles.addButtonText}>Delete</Text>
+                    </TouchableOpacity>
+                </View>
 
                 <DateTimePickerModal
                     isVisible={isDatePickerVisible}
@@ -335,7 +378,20 @@ const styles = StyleSheet.create({
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.bold,
         fontSize: typography.sizes.small,
-    }
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 20,
+    },
+    updateButton: {
+        width: '45%',
+        backgroundColor: colors.black,
+    },
+    deleteButton: {
+        width: '45%',
+        backgroundColor: colors.error_red,
+    },
 });
 
-export default AddBudgetItem;
+export default EditBudgetItem;

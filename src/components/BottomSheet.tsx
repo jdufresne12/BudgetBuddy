@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, Platform, Modal, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Dimensions } from 'react-native';
+import { Animated, Platform, Modal, StyleSheet, View, TouchableOpacity, KeyboardAvoidingView } from 'react-native';
 import { colors } from '../assets/theme';
 
 interface BottomSheetProps {
   visible: boolean,
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  onClose: any,
+  handleCancel: () => void;
   children: any
 }
 
-const BottomSheet = ({ visible, setVisible, onClose, children }: BottomSheetProps) => {
+const BottomSheet = ({ visible, handleCancel, children }: BottomSheetProps) => {
   const [animation] = useState(new Animated.Value(0));
 
   useEffect(() => {
@@ -31,27 +29,32 @@ const BottomSheet = ({ visible, setVisible, onClose, children }: BottomSheetProp
       visible={visible}
       transparent
       animationType="fade"
-      onRequestClose={onClose}
+      onRequestClose={handleCancel}
     >
       <TouchableOpacity
         style={styles.overlay}
         activeOpacity={1}
-        onPress={() => setVisible(false)}
+        onPress={handleCancel}
       >
-        <Animated.View
-          style={[
-            styles.bottomSheet,
-            { transform: [{ translateY }] }
-          ]}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? -75 : 20}
         >
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={(e) => e.stopPropagation()}
-            style={styles.contentContainer}
+          <Animated.View
+            style={[
+              styles.bottomSheet,
+              { transform: [{ translateY }] }
+            ]}
           >
-            {children}
-          </TouchableOpacity>
-        </Animated.View>
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={(e) => e.stopPropagation()}
+              style={styles.contentContainer}
+            >
+              {children}
+            </TouchableOpacity>
+          </Animated.View>
+        </KeyboardAvoidingView>
       </TouchableOpacity>
     </Modal>
   );

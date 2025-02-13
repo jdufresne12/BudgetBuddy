@@ -4,25 +4,61 @@ import Icon from '@react-native-vector-icons/ionicons';
 import { typography, colors } from '../assets/theme.ts';
 import { formatToDollar } from '../utils/textFormatting.ts';
 import { BudgetState } from '../screens/Budget/BudgetTabScreen.tsx';
-import { BudgetItem, DeleteSectionData, sectionAPI, SectionData } from '../api/services/section.ts';
+import { DeleteSectionData, sectionAPI, SectionData } from '../api/services/section.ts';
+import { budgetAPI, BudgetItem, GetSectionsItemsData } from '../api/services/budget';
+
 import { useAuth } from '../contexts/AuthContext.tsx';
 
 import AddBudgetItem from './AddBudgetItem.tsx';
+import EditBudgetItem from './EditBudgetItem.tsx';
 import DeleteSectionModal from './DeleteSectionModal.tsx';
 
 interface BudgetSectionProps {
   section: SectionData;
   setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
-  // subCategories: SubCategories[];
 }
 
 function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): React.JSX.Element {
   const { userData } = useAuth();
-
   const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [showEditItemModal, setShowEditItemModal] = useState(false);
   const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);  // Add this
 
-  let budgetItems: BudgetItem[] = [];
+
+  useEffect(() => {
+    getItems();
+  }, []);
+
+  const getItems = async () => {
+    try {
+      const data: GetSectionsItemsData = {
+        'user_id': userData?.user_id,
+        'section_id': section.section_id,
+      };
+      const response: BudgetItem[] = await budgetAPI.getSectionsItems(data);
+
+      setBudgetState(prevState => {
+        const updatedSection = {
+          ...prevState.sections[section.section_id],
+          budgetItems: response
+        };
+
+        const newSections = {
+          ...prevState.sections,
+          [section.section_id]: updatedSection
+        };
+
+        return {
+          ...prevState,
+          sections: newSections
+        };
+      });
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleRemoveSection = async () => {
     try {
@@ -49,6 +85,11 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
     }
   };
 
+  const handleEditItem = (budgetItem: BudgetItem) => {
+    setSelectedItem(budgetItem);
+    setShowEditItemModal(true);
+  };
+
   return (
     <TouchableOpacity
       style={styles.container}
@@ -59,14 +100,14 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
       <Text style={styles.categoryTitle}>{section.name}</Text>
       <View style={styles.lineSeparator} />
       {
-        budgetItems.length > 0
+        section.budgetItems?.length > 0
           ? (
             <>
-              {budgetItems.map((budgetItem, index) => (
-                <View key={index}>
+              {section.budgetItems.map((budgetItem) => (
+                <View key={budgetItem.item_id}>
                   <TouchableOpacity
                     style={styles.budgetItemContainer}
-                    onPress={() => console.log(`${budgetItem.name} Pressed!`)}
+                    onPress={() => handleEditItem(budgetItem)}
                   >
                     <View style={styles.iconCircle}>
                       <Icon
@@ -101,12 +142,22 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
             color={colors.black}
           />
         </View>
-        <Text style={styles.budgetItemName}> Add Item</Text>
+        <Text style={styles.budgetItemName}>Add Item</Text>
       </TouchableOpacity>
 
       <AddBudgetItem
         isVisible={showAddItemModal}
         setIsVisible={setShowAddItemModal}
+        section_id={section.section_id}
+        handleAddedItem={getItems}
+      />
+
+      <EditBudgetItem
+        isVisible={showEditItemModal}
+        setIsVisible={setShowEditItemModal}
+        section_id={section.section_id}
+        budgetItem={selectedItem}
+        handleUpdateItem={getItems}
       />
 
       <DeleteSectionModal
