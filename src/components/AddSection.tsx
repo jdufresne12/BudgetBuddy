@@ -6,6 +6,7 @@ import {
     StyleSheet,
     Text,
     TextInput,
+    TouchableOpacity,
     TouchableWithoutFeedback,
     View
 } from 'react-native';
@@ -21,7 +22,6 @@ interface AddSectionProps {
 
 function AddSection({ setBudgetState }: AddSectionProps): React.JSX.Element {
     const { userData } = useAuth();
-
     const [newSectionName, setNewSectionName] = useState<string>("");
 
     const handleBlur = async () => {
@@ -57,18 +57,20 @@ function AddSection({ setBudgetState }: AddSectionProps): React.JSX.Element {
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} >
-            <View style={styles.container}>
-                {/* Category Title */}
-                <TextInput
-                    placeholder='New Section'
-                    placeholderTextColor={colors.empty}
-                    style={styles.categoryTitle}
-                    selectionColor={colors.primary}
-                    value={newSectionName}
-                    onChangeText={setNewSectionName}
-                    onBlur={handleBlur}
-                />
-            </View>
+            <TouchableOpacity activeOpacity={1}>
+                <View style={styles.container}>
+                    {/* Category Title */}
+                    <TextInput
+                        placeholder='New Section'
+                        placeholderTextColor={colors.empty}
+                        style={styles.categoryTitle}
+                        selectionColor={colors.primary}
+                        value={newSectionName}
+                        onChangeText={setNewSectionName}
+                        onBlur={handleBlur}
+                    />
+                </View>
+            </TouchableOpacity>
         </TouchableWithoutFeedback>
 
     );
