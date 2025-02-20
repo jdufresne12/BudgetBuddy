@@ -19,36 +19,25 @@ import { GetMonthsSectionsData, sectionAPI, SectionData, SectionName } from "../
 import { useAuth } from "../../contexts/AuthContext.tsx";
 import { BudgetItem } from "../../api/services/budget.ts";
 
+import { sectionMockData } from "../../utils/mockData.ts";
+
 export interface BudgetState {
     sections: Record<SectionName, BudgetItem[]>;
     currentMonth: number;
     currentYear: number;
 }
 
-/**
- * sections
-*          ->  sectionName
-                            ->  item_id: number;
-                                user_id: number | undefined;
-                                section: string;
-                                name: string;
-                                amount: number;
-                                type: string;
-                                start_date: string;
-                                end_date: string | null
-                            }
-*/
-
 function BudgetTabScreen(): React.JSX.Element {
     const { userData } = useAuth();
 
+    const mockDataOn = true;
     const [budgetState, setBudgetState] = useState<BudgetState>({
         sections: {
-            Income: [],
-            Home: [],
-            Food: [],
-            Transportation: [],
-            Subscriptions: []
+            Income: mockDataOn ? sectionMockData.INCOME_SECTION_DATA : [],
+            Home: mockDataOn ? sectionMockData.HOME_SECTION_DATA : [],
+            Food: mockDataOn ? sectionMockData.FOOD_SECTION_DATA : [],
+            Transportation: mockDataOn ? sectionMockData.TRANSPORTATION_SECTION_DATA : [],
+            Subscriptions: mockDataOn ? sectionMockData.SUBSCRIPTION_SECTION_DATA : []
         },
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear()

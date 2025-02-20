@@ -1,5 +1,6 @@
 import apiClient from '../client';
 import { handleApiError } from '../config';
+import { Transaction } from './transaction';
 
 export interface BudgetItem {
     section: string;
@@ -10,6 +11,7 @@ export interface BudgetItem {
     type: string;
     start_date: string;
     end_date: string | null
+    transactions: Transaction[]
 }
 
 export interface CreateBudgetItemData {

@@ -12,12 +12,6 @@ export interface SectionData {
     budgetItems: BudgetItem[];
 }
 
-export interface Transaction {
-    transaction_id: number;
-    name: string;
-    amount: number;
-}
-
 export interface CreateSection {
     user_id: number | undefined;
     name: string;

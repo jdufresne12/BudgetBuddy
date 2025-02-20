@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { colors } from '../../assets/theme.ts'
 import RemainingBudget from "../../components/RemainingBudget.tsx";
-import AddTransaction from "../../components/AddTransaction.tsx";
 
 function OverviewScreen(): React.JSX.Element {
 

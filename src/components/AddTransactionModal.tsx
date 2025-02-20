@@ -15,10 +15,7 @@ import { useAuth } from '../contexts/AuthContext';
 
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
-import { BudgetState } from '../screens/Budget/BudgetTabScreen';
-import { Transaction } from '../api/services/section';
-import { SectionName } from '../api/services/section';
-import { CreateTransactionData } from '../api/services/transaction';
+import { CreateTransactionData, Transaction } from '../api/services/transaction';
 
 interface AddTransactionModalProps {
     isVisible: boolean;
