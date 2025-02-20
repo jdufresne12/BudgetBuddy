@@ -2,8 +2,8 @@ import apiClient from '../client';
 import { handleApiError } from '../config';
 
 export interface BudgetItem {
+    section: string;
     item_id: number;
-    section_id: number;
     user_id: number | undefined;
     name: string;
     amount: number;
@@ -13,7 +13,7 @@ export interface BudgetItem {
 }
 
 export interface CreateBudgetItemData {
-    section_id: number;
+    section: string;
     user_id: number | undefined;
     name: string;
     amount: number;
@@ -23,14 +23,14 @@ export interface CreateBudgetItemData {
 }
 
 export interface DeleteBudgetItemData {
-    section_id: number;
+    section: string;
     user_id: number | undefined;
     item_id: number;
 }
 
 export interface GetSectionsItemsData {
+    section: string;
     user_id: number | undefined;
-    section_id: number;
 }
 
 export const budgetAPI = {

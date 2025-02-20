@@ -17,15 +17,18 @@ import { budgetAPI } from '../api/services/budget';
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
 import { CreateBudgetItemData, BudgetItem } from '../api/services/budget';
+import { BudgetState } from '../screens/Budget/BudgetTabScreen';
+import { SectionName } from '../api/services/section';
 
 interface AddBudgetItemProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    section_id: number;
+    section: string;
+    setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
     handleAddedItem: () => void;
 }
 
-const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }: AddBudgetItemProps) => {
+const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, handleAddedItem }: AddBudgetItemProps) => {
     const { userData } = useAuth();
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
@@ -35,10 +38,8 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
     const [endDateError, setEndDateError] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState<boolean>(false);
 
-    const handleCancel = async () => {
-        await resetData();
-        setIsVisible(false)
-    };
+    const showDatePicker = () => { setDatePickerVisibility(true) };
+    const hideDatePicker = () => { setDatePickerVisibility(false) };
 
     async function resetData() {
         setAmount(0);
@@ -49,12 +50,15 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
         setEndDateError(null);
     };
 
-    const showDatePicker = () => { setDatePickerVisibility(true) };
-    const hideDatePicker = () => { setDatePickerVisibility(false) };
     const handleConfirm = (date: Date) => {
         const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
         setEndDate(formattedDate);
         hideDatePicker();
+    };
+
+    const handleCancel = async () => {
+        await resetData();
+        setIsVisible(false)
     };
 
     const handleSetName = (text: string) => {
@@ -94,19 +98,38 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section_id, handleAddedItem }:
 
         if (isValid) {
             try {
-                const data: CreateBudgetItemData = {
-                    "section_id": section_id,
+                // const data: CreateBudgetItemData = {
+                //     "section": section,
+                //     "user_id": userData?.user_id,
+                //     "name": name,
+                //     "amount": amount,
+                //     "type": itemType,
+                //     "start_date": getCurrentDate(),
+                //     "end_date": endDate
+                // }
+                // const response = await budgetAPI.createBudgetItem(data);
+                // if (response) {
+                //     handleAddedItem();
+                // }
+                const newItem: BudgetItem = {
+                    "section": section,
                     "user_id": userData?.user_id,
+                    "item_id": 0,
                     "name": name,
                     "amount": amount,
                     "type": itemType,
                     "start_date": getCurrentDate(),
                     "end_date": endDate
                 }
-                const response = await budgetAPI.createBudgetItem(data);
-                if (response) {
-                    handleAddedItem();
-                }
+                setBudgetState((prevState) => ({
+                    ...prevState,
+                    sections: {
+                        ...prevState.sections,
+                        [section as SectionName]: [...prevState.sections[section as SectionName], newItem],
+                    },
+                }));
+
+                handleAddedItem();
             } catch (error) {
                 console.error(error);
             } finally {

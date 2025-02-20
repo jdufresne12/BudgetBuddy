@@ -2,6 +2,8 @@ import apiClient from '../client';
 import { handleApiError } from '../config';
 import { BudgetItem } from './budget';
 
+export type SectionName = "Income" | "Home" | "Food" | "Transportation" | "Subscriptions";
+
 export interface SectionData {
     section_id: number;
     name: string;
@@ -30,8 +32,8 @@ export interface GetMonthsSectionsData {
 };
 
 export interface DeleteSectionData {
+    section: string;
     user_id: number | undefined;
-    section_id: number | undefined;
 };
 
 

@@ -14,46 +14,33 @@ import EditBudgetItem from './EditBudgetItem.tsx';
 import DeleteSectionModal from './DeleteSectionModal.tsx';
 
 interface BudgetSectionProps {
-  section: SectionData;
+  section: string;
+  budgetItems: BudgetItem[];
   setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
 }
 
-function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): React.JSX.Element {
+function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSectionProps): React.JSX.Element {
   const { userData } = useAuth();
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showEditItemModal, setShowEditItemModal] = useState(false);
   const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);  // Add this
-
+  const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);
 
   useEffect(() => {
-    getItems();
-  }, []);
+    console.log(budgetItems)
+  }, [budgetItems])
+
+  // useEffect(() => {
+  //   getItems();
+  // }, []);
 
   const getItems = async () => {
     try {
       const data: GetSectionsItemsData = {
         'user_id': userData?.user_id,
-        'section_id': section.section_id,
+        'section': section,
       };
-      const response: BudgetItem[] = await budgetAPI.getSectionsItems(data);
-
-      setBudgetState(prevState => {
-        const updatedSection = {
-          ...prevState.sections[section.section_id],
-          budgetItems: response
-        };
-
-        const newSections = {
-          ...prevState.sections,
-          [section.section_id]: updatedSection
-        };
-
-        return {
-          ...prevState,
-          sections: newSections
-        };
-      });
+      // const response: BudgetItem[] = await budgetAPI.getSectionsItems(data);
 
     } catch (error) {
       console.error(error);
@@ -61,23 +48,13 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
   };
 
   const handleRemoveSection = async () => {
+    // Currently not being used
     try {
       const data: DeleteSectionData = {
         'user_id': userData?.user_id,
-        'section_id': section.section_id
+        'section': section
       }
-
-      const response = await sectionAPI.deleteSection(data)
-      if (response) {
-        setBudgetState(prevState => {
-          const newSections = { ...prevState.sections };
-          delete newSections[section.section_id];
-          return {
-            ...prevState,
-            sections: newSections
-          };
-        });
-      }
+      // const response = await sectionAPI.deleteSection(data)
     } catch (error) {
       console.error(error);
     } finally {
@@ -94,16 +71,16 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
     <TouchableOpacity
       style={styles.container}
       activeOpacity={1}
-      onLongPress={() => setShowDeleteSectionModal(true)}
+      onLongPress={() => console.log("setShowDeleteSectionModal(true)")}
       delayLongPress={500}
     >
-      <Text style={styles.categoryTitle}>{section.name}</Text>
+      <Text style={styles.categoryTitle}>{section}</Text>
       <View style={styles.lineSeparator} />
       {
-        section.budgetItems?.length > 0
+        budgetItems?.length > 0
           ? (
             <>
-              {section.budgetItems.map((budgetItem) => (
+              {budgetItems.map((budgetItem) => (
                 <View key={budgetItem.item_id}>
                   <TouchableOpacity
                     style={styles.budgetItemContainer}
@@ -148,23 +125,25 @@ function BudgetSectionCard({ section, setBudgetState }: BudgetSectionProps): Rea
       <AddBudgetItem
         isVisible={showAddItemModal}
         setIsVisible={setShowAddItemModal}
-        section_id={section.section_id}
+        section={section}
+        setBudgetState={setBudgetState}
         handleAddedItem={getItems}
       />
 
       <EditBudgetItem
         isVisible={showEditItemModal}
         setIsVisible={setShowEditItemModal}
-        section_id={section.section_id}
+        section={section}
         budgetItem={selectedItem}
+        setBudgetState={setBudgetState}
         handleUpdateItem={getItems}
       />
 
-      <DeleteSectionModal
+      {/* <DeleteSectionModal
         isVisible={showDeleteSectionModal}
         setIsVisible={setShowDeleteSectionModal}
         handleRemoveSection={handleRemoveSection}
-      />
+      /> */}
 
     </TouchableOpacity>
   );

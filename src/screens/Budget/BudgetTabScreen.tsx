@@ -15,40 +15,41 @@ import ExpensesChart from "../../components/ExpensesChart.tsx";
 import BudgetSectionCard from '../../components/BudgetSectionCard.tsx';
 import AddSection from "../../components/AddSection.tsx";
 import Icon from "@react-native-vector-icons/ionicons";
-import { GetMonthsSectionsData, sectionAPI, SectionData } from "../../api/services/section.ts";
+import { GetMonthsSectionsData, sectionAPI, SectionData, SectionName } from "../../api/services/section.ts";
 import { useAuth } from "../../contexts/AuthContext.tsx";
 import { BudgetItem } from "../../api/services/budget.ts";
 
 export interface BudgetState {
-    sections: Record<number, SectionData>;
+    sections: Record<SectionName, BudgetItem[]>;
     currentMonth: number;
     currentYear: number;
 }
 
 /**
- * Sections
- *      ->  section_id: number;
-            name: string;
-            start_date: string;
-            end_date: string | null;
-            budgetItems: BudgetItem[];
-               |
-                ->  item_id: number;
-                    section_id: number;
-                    user_id: number | undefined;
-                    name: string;
-                    amount: number;
-                    type: string;
-                    start_date: string;
-                    end_date: string | null
-                }
+ * sections
+*          ->  sectionName
+                            ->  item_id: number;
+                                user_id: number | undefined;
+                                section: string;
+                                name: string;
+                                amount: number;
+                                type: string;
+                                start_date: string;
+                                end_date: string | null
+                            }
 */
 
 function BudgetTabScreen(): React.JSX.Element {
     const { userData } = useAuth();
 
     const [budgetState, setBudgetState] = useState<BudgetState>({
-        sections: {},
+        sections: {
+            Income: [],
+            Home: [],
+            Food: [],
+            Transportation: [],
+            Subscriptions: []
+        },
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear()
     });
@@ -59,44 +60,44 @@ function BudgetTabScreen(): React.JSX.Element {
     const [totalExpenses, setTotalExpenses] = useState<number>(0);
     const [circleProgress, setCircleProgress] = useState<number>(0);
 
-    useEffect(() => {
-        getSections();
-    }, [])
+    const sections = ["Income", "Home", "Food", "Transporation", "Subscriptions"];
 
-    useEffect(() => {
-        getSections()
-    }, [currentMonth])
+    // useEffect(() => {
+    //     const getSections = async () => {
+    //         try {
+    //             const data: GetMonthsSectionsData = {
+    //                 'user_id': userData?.user_id,
+    //                 'month': currentMonth,
+    //                 'year': currentYear
+    //             };
+    //             const response: SectionData[] = await sectionAPI.getMonthsSections(data);
+
+    //             const sectionsRecord: Record<number, SectionData> = response.reduce((acc, section) => ({
+    //                 ...acc,
+    //                 [section.section_id]: {
+    //                     ...section,
+    //                     budgetItems: []
+    //                 }
+    //             }), {});
+
+    //             setBudgetState(prevState => ({
+    //                 ...prevState,
+    //                 sections: sectionsRecord
+    //             }));
+
+    //         } catch (error) {
+    //             console.error(error);
+    //         }
+    //     };
+    //     getSections()
+
+    //     console.log(currentMonth)
+    //     console.log(currentYear)
+    // }, [currentMonth])
 
     useEffect(() => {
         calculateBudget();
     }, [budgetState])
-
-    const getSections = async () => {
-        try {
-            const data: GetMonthsSectionsData = {
-                'user_id': userData?.user_id,
-                'month': currentMonth,
-                'year': currentYear
-            };
-            const response: SectionData[] = await sectionAPI.getMonthsSections(data);
-
-            const sectionsRecord: Record<number, SectionData> = response.reduce((acc, section) => ({
-                ...acc,
-                [section.section_id]: {
-                    ...section,
-                    budgetItems: []
-                }
-            }), {});
-
-            setBudgetState(prevState => ({
-                ...prevState,
-                sections: sectionsRecord
-            }));
-
-        } catch (error) {
-            console.error(error);
-        }
-    };
 
     const calculateBudget = () => {
         const totalIncome: number = calculateTotalIncome(budgetState.sections) || 0;
@@ -165,10 +166,11 @@ function BudgetTabScreen(): React.JSX.Element {
                     {Object.keys(budgetState.sections).length !== 0
                         ? (
                             <View style={styles.budgetCardsContainer}>
-                                {Object.values(budgetState.sections).map((section, index) =>
+                                {Object.entries(budgetState.sections).map(([sectionName, budgetItems]) =>
                                     <BudgetSectionCard
-                                        key={index}
-                                        section={section}
+                                        key={sectionName}
+                                        section={sectionName}
+                                        budgetItems={budgetItems}
                                         setBudgetState={setBudgetState}
                                     />
                                 )}

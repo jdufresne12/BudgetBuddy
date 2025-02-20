@@ -17,16 +17,19 @@ import { budgetAPI, DeleteBudgetItemData } from '../api/services/budget';
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
 import { CreateBudgetItemData, BudgetItem } from '../api/services/budget';
+import { BudgetState } from '../screens/Budget/BudgetTabScreen';
+import { SectionName } from '../api/services/section';
 
 interface EditBudgetItemProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
-    section_id: number;
+    section: string;
     budgetItem: BudgetItem | null;
+    setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
     handleUpdateItem: () => void;
 }
 
-const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handleUpdateItem }: EditBudgetItemProps) => {
+const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudgetState, handleUpdateItem }: EditBudgetItemProps) => {
     const { userData } = useAuth();
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
@@ -45,10 +48,8 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
         }
     }, [budgetItem]);
 
-    const handleCancel = async () => {
-        await resetData();
-        setIsVisible(false)
-    };
+    const showDatePicker = () => { setDatePickerVisibility(true) };
+    const hideDatePicker = () => { setDatePickerVisibility(false) };
 
     async function resetData() {
         setAmount(0);
@@ -57,6 +58,17 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
         setEndDate(null);
         setNameError(null);
         setEndDateError(null);
+    };
+
+    const handleConfirm = (date: Date) => {
+        const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
+        setEndDate(formattedDate);
+        hideDatePicker();
+    };
+
+    const handleCancel = async () => {
+        await resetData();
+        setIsVisible(false)
     };
 
     const handleSetName = (text: string) => {
@@ -98,7 +110,7 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
             try {
                 const data: BudgetItem = {
                     item_id: budgetItem.item_id,
-                    section_id: section_id,
+                    section: section,
                     user_id: userData?.user_id,
                     name: name,
                     amount: amount,
@@ -106,11 +118,21 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
                     start_date: budgetItem.start_date,
                     end_date: endDate
                 };
+                // const response = await budgetAPI.updateBudgetItem(data);
+                // if (response) {
+                //     handleUpdateItem();
+                // }
 
-                const response = await budgetAPI.updateBudgetItem(data);
-                if (response) {
-                    handleUpdateItem();
-                }
+                setBudgetState((prevState) => ({
+                    ...prevState,
+                    sections: {
+                        ...prevState.sections,
+                        [section as SectionName]: prevState.sections[section as SectionName].map(
+                            (item) => item.item_id === data.item_id ? data : item
+                        )
+                    }
+                }))
+
             } catch (error) {
                 console.error(error);
             } finally {
@@ -126,12 +148,21 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
                 const data: DeleteBudgetItemData = {
                     item_id: budgetItem.item_id,
                     user_id: userData?.user_id,
-                    section_id: section_id
+                    section: section
                 };
-                const response = await budgetAPI.deleteBudgetItem(data);
-                if (response) {
-                    handleUpdateItem();
-                }
+                // const response = await budgetAPI.deleteBudgetItem(data);
+                // if (response) {
+                //     handleUpdateItem();
+                // }
+                setBudgetState((prevState) => ({
+                    ...prevState,
+                    sections: {
+                        ...prevState.sections,
+                        [section as SectionName]: prevState.sections[section as SectionName].filter(
+                            (item) => item.item_id !== data.item_id
+                        )
+                    }
+                }))
             } catch (error) {
                 console.error(error);
             } finally {
@@ -139,14 +170,6 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section_id, budgetItem, handl
                 await resetData();
             }
         }
-    };
-
-    const showDatePicker = () => { setDatePickerVisibility(true) };
-    const hideDatePicker = () => { setDatePickerVisibility(false) };
-    const handleConfirm = (date: Date) => {
-        const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
-        setEndDate(formattedDate);
-        hideDatePicker();
     };
 
     return (
