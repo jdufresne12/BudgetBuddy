@@ -23,11 +23,11 @@ export function isValidDateFormat(dateStr: string): boolean {
     }
 
     const [year, month, day] = dateStr.split('-').map(Number);
-    const date = new Date(year, month - 1, day)
+    const date = new Date(year, month - 1, day);
 
     return date.getFullYear() === year &&
-        date.getMonth() === month &&
-        date.getDay() === day;
+        date.getMonth() === month - 1 &&
+        date.getDate() === day;
 }
 
 /**
