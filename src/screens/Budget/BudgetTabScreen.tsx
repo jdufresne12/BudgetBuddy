@@ -134,7 +134,7 @@ function BudgetTabScreen(): React.JSX.Element {
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <ScrollView
-                style={{ width: '100%', height: '100%', backgroundColor: colors.secondary, }}
+                style={{ backgroundColor: colors.secondary, }}
             >
                 <View style={styles.container}>
                     <View style={styles.monthSliderContainer}>
@@ -173,7 +173,7 @@ function BudgetTabScreen(): React.JSX.Element {
                         )
                     }
 
-                    <AddSection setBudgetState={setBudgetState} />
+                    {/* <AddSection setBudgetState={setBudgetState} /> */}
                 </View>
             </ScrollView >
         </KeyboardAvoidingView>
@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
         width: '100%',
         minHeight: "20%",
         marginTop: 10,
+        marginBottom: 30,
         gap: 20,
     },
 });

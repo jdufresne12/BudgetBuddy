@@ -116,7 +116,8 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
                     amount: amount,
                     type: itemType,
                     start_date: budgetItem.start_date,
-                    end_date: endDate
+                    end_date: endDate,
+                    transactions: [],
                 };
                 // const response = await budgetAPI.updateBudgetItem(data);
                 // if (response) {

@@ -119,7 +119,8 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, handl
                     "amount": amount,
                     "type": itemType,
                     "start_date": getCurrentDate(),
-                    "end_date": endDate
+                    "end_date": endDate,
+                    "transactions": []
                 }
                 setBudgetState((prevState) => ({
                     ...prevState,

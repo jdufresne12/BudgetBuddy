@@ -74,7 +74,12 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
       onLongPress={() => console.log("setShowDeleteSectionModal(true)")}
       delayLongPress={500}
     >
-      <Text style={styles.categoryTitle}>{section}</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={styles.categoryTitle}>{section}</Text>
+        <TouchableOpacity style={{ justifyContent: 'flex-end', marginRight: 20 }}>
+          <Text style={{}}>Transactions</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.lineSeparator} />
       {
         budgetItems?.length > 0
@@ -173,6 +178,7 @@ const styles = StyleSheet.create({
     }),
   },
   categoryTitle: {
+    flex: 1,
     height: 50,
     paddingTop: 25,
     paddingLeft: 25,
