@@ -16,12 +16,45 @@ const transactionMockData = {
         {
             "user_id": 1,
             "item_id": 5,
-            "transaction_id": 1,
+            "transaction_id": 2,
             "description": "Publix",
             "amount": 100,
             "type": "expense",
             "date": (getCurrentDate())
         }
+    ],
+    INCOME_TRANSACTIONS: [
+        {
+            "user_id": 1,
+            "item_id": 1,
+            "transaction_id": 3,
+            "description": "Pay Day",
+            "amount": 50000,
+            "type": "income",
+            "date": (getCurrentDate())
+        },
+    ],
+    RENT_TRANSACTION: [
+        {
+            "user_id": 1,
+            "item_id": 2,
+            "transaction_id": 4,
+            "description": "Rent",
+            "amount": 2000,
+            "type": "expense",
+            "date": (getCurrentDate())
+        },
+    ],
+    WATER_TRANSACTION: [
+        {
+            "user_id": 1,
+            "item_id": 2,
+            "transaction_id": 5,
+            "description": "Water Bill",
+            "amount": 120,
+            "type": "expense",
+            "date": (getCurrentDate())
+        },
     ]
 }
 
@@ -37,7 +70,7 @@ export const sectionMockData = {
             "type": "income",
             "start_date": (getCurrentDate()),
             "end_date": null,
-            "transactions": []
+            "transactions": transactionMockData.INCOME_TRANSACTIONS
         }
     ],
 
@@ -52,7 +85,7 @@ export const sectionMockData = {
             "type": "expense",
             "start_date": (getCurrentDate()),
             "end_date": null,
-            "transactions": []
+            "transactions": transactionMockData.RENT_TRANSACTION
         },
         {
             "section": "home",
@@ -63,7 +96,7 @@ export const sectionMockData = {
             "type": "expense",
             "start_date": (getCurrentDate()),
             "end_date": null,
-            "transactions": []
+            "transactions": transactionMockData.WATER_TRANSACTION
         },
     ],
 

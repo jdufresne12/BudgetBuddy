@@ -12,6 +12,7 @@ import { useAuth } from '../contexts/AuthContext.tsx';
 import AddBudgetItem from './AddBudgetItem.tsx';
 import EditBudgetItem from './EditBudgetItem.tsx';
 import DeleteSectionModal from './DeleteSectionModal.tsx';
+import ViewTransactionsModal from './ViewTransactionsModal.tsx';
 
 interface BudgetSectionProps {
   section: string;
@@ -25,10 +26,7 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
   const [showEditItemModal, setShowEditItemModal] = useState(false);
   const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);
-
-  useEffect(() => {
-    console.log(budgetItems)
-  }, [budgetItems])
+  const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
 
   // useEffect(() => {
   //   getItems();
@@ -76,10 +74,16 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
     >
       <View style={{ flexDirection: 'row' }}>
         <Text style={styles.categoryTitle}>{section}</Text>
-        <TouchableOpacity style={{ justifyContent: 'flex-end', marginRight: 20 }}>
-          <Text style={{}}>Transactions</Text>
+        <TouchableOpacity
+          style={styles.viewTransactionsButton}
+          onPress={() => setShowTransactionModal(true)}
+        >
+          <Text style={styles.viewTransactionsButtonText}>
+            View Transactions
+          </Text>
         </TouchableOpacity>
       </View>
+
       <View style={styles.lineSeparator} />
       {
         budgetItems?.length > 0
@@ -150,6 +154,14 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
         handleRemoveSection={handleRemoveSection}
       /> */}
 
+      <ViewTransactionsModal
+        isVisible={showTransactionModal}
+        setIsVisible={setShowTransactionModal}
+        section={section}
+        budgetItems={budgetItems}
+        handleRemoveSection={() => { }}
+      />
+
     </TouchableOpacity>
   );
 }
@@ -176,6 +188,17 @@ const styles = StyleSheet.create({
         elevation: 5,
       },
     }),
+  },
+  viewTransactionsButton: {
+    justifyContent: 'flex-end',
+    marginRight: 20
+  },
+  viewTransactionsButtonText: {
+    paddingBottom: 3,
+    fontFamily: typography.fontFamily,
+    fontWeight: typography.fontWeights.tiny,
+    fontSize: typography.sizes.small,
+    color: colors.black
   },
   categoryTitle: {
     flex: 1,

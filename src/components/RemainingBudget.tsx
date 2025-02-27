@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
     StyleSheet,
     Text,
@@ -14,35 +14,33 @@ function RemainingBudget(): React.JSX.Element {
     const [amountSpent, setAmountSpent] = useState<number>(300);
 
     return (
-      <View style={styles.container}>
-        <View style={styles.budgetTitleContainer}>
-          <Text style={styles.budgetTitle}>Budget</Text>
-        </View>
-
-        <View style={styles.leftToSpendContainer}>
-            <Text style={styles.leftToSpendText}>LEFT TO SPEND</Text>
-        </View>
-
-        <View style={styles.budgetContainer}>
-            <Text style={styles.budgetText}>{formatToDollar(remainingBudget)}</Text>
-            <View style={styles.progressBar}>
-                <Progress.Bar 
-                    progress={amountSpent/budget} 
-                    width={335} 
-                    borderWidth={0}
-                    color={colors.primary}
-                    unfilledColor={colors.secondary}
-                />
+        <View style={styles.container}>
+            <View style={styles.budgetTitleContainer}>
+                <Text style={styles.budgetTitle}>Budget</Text>
             </View>
-            <Text style={styles.leftToSpendText}>
-                OF YOUR
-                <Text style={styles.spentText}>{` ${formatToDollar(budget)} `}</Text>
-                BUDGET
-            </Text>
-        </View>
 
-        {/*  */}
-      </View>
+            <View style={styles.leftToSpendContainer}>
+                <Text style={[styles.leftToSpendText, { paddingBottom: -10 }]}>LEFT TO SPEND</Text>
+            </View>
+
+            <View style={styles.budgetContainer}>
+                <Text style={styles.budgetText}>{formatToDollar(remainingBudget)}</Text>
+                <View style={styles.progressBar}>
+                    <Progress.Bar
+                        progress={amountSpent / budget}
+                        width={300}
+                        borderWidth={0}
+                        color={colors.primary}
+                        unfilledColor={colors.secondary}
+                    />
+                </View>
+                <Text style={styles.leftToSpendText}>
+                    OF YOUR
+                    <Text style={styles.spentText}>{` ${formatToDollar(budget)} `}</Text>
+                    BUDGET
+                </Text>
+            </View>
+        </View>
     );
 }
 
@@ -66,9 +64,9 @@ const styles = StyleSheet.create({
     leftToSpendContainer: {
         paddingLeft: 30,
         paddingBottom: 5,
-    },  
+    },
     leftToSpendText: {
-        paddingTop: 10,
+        paddingVertical: 10,
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.bold,
         fontSize: typography.sizes.small,
@@ -76,7 +74,7 @@ const styles = StyleSheet.create({
     },
     budgetContainer: {
         paddingLeft: 30,
-    },  
+    },
     budgetText: {
         fontFamily: typography.fontFamily,
         fontWeight: typography.fontWeights.heavy,

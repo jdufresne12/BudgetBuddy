@@ -12,7 +12,9 @@ export const typography: any = {
     heavier: '800',
   },
   sizes: {
+    tiny: 10,
     small: 12,
+    medium: 14,
     body: 16,
     title: 18,
     header: 22,
@@ -29,4 +31,6 @@ export const colors: any = {
   empty: '#e4e4e4',
   error_red: '#fc212f',
   remove: '#ff4262',
+  income_green: "#178a36",
+  expense_red: "#EA4D3D"
 };
