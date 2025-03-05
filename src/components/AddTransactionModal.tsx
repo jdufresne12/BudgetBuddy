@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import Icon from '@react-native-vector-icons/ionicons';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { Dropdown } from 'react-native-element-dropdown';
 import { colors, typography } from '../assets/theme';
 import { getCurrentDate, isValidDateFormat } from '../utils/textFormatting';
 import { useAuth } from '../contexts/AuthContext';
@@ -52,7 +53,7 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
         setItemType('expense');
         setDescription('');
         setDate(getCurrentDate());
-        setCategory({ name: "miscellaneous", item_id: 0 })
+        setCategory({ name: "", item_id: 0 })
         setDescriptionError(null);
         setDateError(null);
     };
@@ -110,19 +111,6 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
                     type: itemType,
                     date: date
                 };
-                // const response = await budgetAPI.updateBudgetItem(data);
-                // if (response) {
-                //     handleUpdateItem();
-                // }
-                // setBudgetState((prevState) => ({
-                //     ...prevState,
-                //     sections: {
-                //         ...prevState.sections,
-                //         [section as SectionName]: prevState.sections[section as SectionName].map(
-                //             (item) => item.item_id === data.item_id ? data : item
-                //         )
-                //     }
-                // }))
                 console.log(newTransaction);
             } catch (error) {
                 console.error(error);
@@ -132,6 +120,17 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
             }
         }
     };
+
+    const data = [
+        { name: 'Work', item_id: '1' },
+        { name: 'Rent', item_id: '2' },
+        { name: 'Water', item_id: '3' },
+        { name: 'Groceries', item_id: '4' },
+        { name: 'Eating out', item_id: '5' },
+        { name: 'Gas', item_id: '6' },
+        { name: 'Insurance', item_id: '7' },
+        { name: 'Netflix', item_id: '8' },
+    ];
 
     return (
         <BottomSheet visible={isVisible} handleCancel={handleCancel}>
@@ -173,7 +172,7 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
 
                 <View style={styles.fieldContainer}>
                     <View style={styles.iconCircle}>
-                        <Icon name='folder-sharp' size={22} color={colors.white} />
+                        <Icon name='pencil' size={22} color={colors.white} />
                     </View>
                     <TextInput
                         style={styles.categoryText}
@@ -189,15 +188,35 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
 
                 <View style={styles.lineSeparator} />
 
-                <TouchableOpacity
-                    style={styles.fieldContainer}
-                    onPress={() => { }}
-                >
+                <View style={[styles.fieldContainer, { paddingRight: 15 }]}>
                     <View style={styles.iconCircle}>
-                        <Icon name='folder-sharp' size={22} color={colors.white} />
+                        <Icon name="folder-outline" size={22} color={colors.white} />
                     </View>
-                    <Text style={styles.categoryText}>{category.name !== "" ? category.name : "Category"}</Text>
-                </TouchableOpacity>
+                    <Dropdown
+                        style={styles.dropdown}
+                        containerStyle={styles.dropdownContainer}
+                        placeholderStyle={styles.placeholderStyle}
+                        selectedTextStyle={styles.selectedTextStyle}
+                        itemTextStyle={styles.itemTextStyle}
+                        data={data}
+                        maxHeight={200}
+                        labelField="name"
+                        valueField="item_id"
+                        placeholder="Category"
+                        value={category.item_id?.toString()}
+                        onChange={item => {
+                            setCategory({
+                                name: item.name,
+                                item_id: parseInt(item.item_id)
+                            });
+                        }}
+                        renderItem={(item, selected) => (
+                            <View style={[styles.dropdownItem, selected && { backgroundColor: colors.primary }]}>
+                                <Text style={styles.itemTextStyle}>{item.name}</Text>
+                            </View>
+                        )}
+                    />
+                </View>
 
                 <View style={styles.lineSeparator} />
 
@@ -312,7 +331,7 @@ const styles = StyleSheet.create({
         padding: 8,
         color: colors.inactive,
         fontFamily: typography.fontFamily,
-        fontWeight: typography.fontWeights.tony,
+        fontWeight: typography.fontWeights.tiny,
         fontSize: typography.sizes.body,
     },
     categoryNameText: {
@@ -380,6 +399,53 @@ const styles = StyleSheet.create({
     deleteButton: {
         width: '45%',
         backgroundColor: colors.error_red,
+    },
+    dropdown: {
+        flex: 1,
+        width: "100%",
+        height: 40,
+        paddingLeft: 10,
+        paddingRight: 10,
+    },
+    dropdownContainer: {
+        width: "100%",
+        left: 0,
+        marginTop: 18,
+        borderRadius: 10,
+        backgroundColor: colors.empty,
+        shadowColor: '#000',
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    placeholderStyle: {
+        color: colors.inactive,
+        fontFamily: typography.fontFamily,
+        fontWeight: typography.fontWeights.tiny,
+        fontSize: typography.sizes.body,
+    },
+    selectedTextStyle: {
+        color: colors.black,
+        fontFamily: typography.fontFamily,
+        fontWeight: typography.fontWeights.tiny,
+        fontSize: typography.sizes.body,
+    },
+    itemTextStyle: {
+        color: colors.black,
+        fontFamily: typography.fontFamily,
+        fontWeight: typography.fontWeights.bold,
+        fontSize: typography.sizes.body,
+    },
+    dropdownItem: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 50,
+        borderBottomWidth: 1,
+        borderBottomColor: colors.secondary,
     },
 });
 

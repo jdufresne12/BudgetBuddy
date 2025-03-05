@@ -2,7 +2,7 @@ import apiClient from '../client';
 import { handleApiError } from '../config';
 import { BudgetItem } from './budget';
 
-export type SectionName = "Income" | "Home" | "Food" | "Transportation" | "Subscriptions";
+export type SectionName = "Income" | "Home" | "Food" | "Transportation" | "Subscriptions" | "Other";
 
 export interface SectionData {
     section_id: number;

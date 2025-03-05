@@ -37,7 +37,8 @@ function BudgetTabScreen(): React.JSX.Element {
             Home: mockDataOn ? sectionMockData.HOME_SECTION_DATA : [],
             Food: mockDataOn ? sectionMockData.FOOD_SECTION_DATA : [],
             Transportation: mockDataOn ? sectionMockData.TRANSPORTATION_SECTION_DATA : [],
-            Subscriptions: mockDataOn ? sectionMockData.SUBSCRIPTION_SECTION_DATA : []
+            Subscriptions: mockDataOn ? sectionMockData.SUBSCRIPTION_SECTION_DATA : [],
+            Other: [],
         },
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear()
@@ -89,8 +90,8 @@ function BudgetTabScreen(): React.JSX.Element {
     }, [budgetState])
 
     const calculateBudget = () => {
-        const totalIncome: number = calculateTotalIncome(budgetState.sections) || 0;
-        const totalExpense: number = calculateTotalExpense(budgetState.sections) || 0;
+        const totalIncome: number = calculateTotalIncome(budgetState.sections);
+        const totalExpense: number = calculateTotalExpense(budgetState.sections);
         const remainingBudget: number = totalIncome - totalExpense;
         const remainingBudgetPercent: number = (totalExpense / totalIncome) || 0;
 
@@ -102,23 +103,21 @@ function BudgetTabScreen(): React.JSX.Element {
 
     const calculateTotalIncome = (sections: any): number => {
         sections = Object.values(sections);
-        return sections.reduce((totalIncome: number, section: SectionData) => {
-            const budgetItems = section.budgetItems || [];
-
+        return sections.reduce((totalIncome: number, budgetItems: BudgetItem[]) => {
             const sectionIncome = budgetItems.reduce((itemTotal: number, item: BudgetItem) => {
                 if (item.type?.toLowerCase() === "income") {
                     return itemTotal + (item.amount || 0);
                 }
                 return itemTotal;
             }, 0);
+
             return totalIncome + sectionIncome;
         }, 0);
     };
 
     const calculateTotalExpense = (sections: any) => {
         sections = Object.values(sections);
-        return sections.reduce((totalExpense: number, section: SectionData) => {
-            const bugdetItems = section.budgetItems || [];
+        return sections.reduce((totalExpense: number, bugdetItems: BudgetItem[]) => {
             const sectionTotal = bugdetItems.reduce((itemTotal: number, item: BudgetItem) => {
                 if (item.type?.toLowerCase() === 'expense') {
                     return itemTotal + (item.amount || 0);
@@ -146,11 +145,13 @@ function BudgetTabScreen(): React.JSX.Element {
                         />
                     </View>
 
-                    <ExpensesChart
-                        remainingBudget={remainingBudget}
-                        totalExpenses={totalExpenses}
-                        circleProgress={circleProgress}
-                    />
+                    <TouchableOpacity onPress={calculateBudget}>
+                        <ExpensesChart
+                            remainingBudget={remainingBudget}
+                            totalExpenses={totalExpenses}
+                            circleProgress={circleProgress}
+                        />
+                    </TouchableOpacity>
 
                     {Object.keys(budgetState.sections).length !== 0
                         ? (

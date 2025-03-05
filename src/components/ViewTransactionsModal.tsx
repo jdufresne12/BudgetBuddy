@@ -138,7 +138,9 @@ function ViewTransactionsModal({ isVisible, setIsVisible, section, budgetItems, 
                                     </>
                                 )
                                 : <>
-                                    <Text>Nothing to Track</Text>
+                                    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                        <Text>Nothing to Track</Text>
+                                    </View>
                                 </>
                             }
                         </View>

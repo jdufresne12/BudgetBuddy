@@ -59,7 +59,6 @@ const transactionMockData = {
 }
 
 export const sectionMockData = {
-    // Income Section Data
     INCOME_SECTION_DATA: [
         {
             "section": "income",
@@ -73,8 +72,6 @@ export const sectionMockData = {
             "transactions": transactionMockData.INCOME_TRANSACTIONS
         }
     ],
-
-    // Home Section Data
     HOME_SECTION_DATA: [
         {
             "section": "home",
@@ -99,8 +96,6 @@ export const sectionMockData = {
             "transactions": transactionMockData.WATER_TRANSACTION
         },
     ],
-
-    // Food Section Data
     FOOD_SECTION_DATA: [
         {
             "section": "food",
@@ -125,8 +120,6 @@ export const sectionMockData = {
             "transactions": []
         },
     ],
-
-    // Transportation Section Data
     TRANSPORTATION_SECTION_DATA: [
         {
             "section": "transportation",
@@ -151,8 +144,6 @@ export const sectionMockData = {
             "transactions": []
         },
     ],
-
-    // Subscription Section Data
     SUBSCRIPTION_SECTION_DATA: [
         {
             "section": "subscription",
@@ -160,21 +151,6 @@ export const sectionMockData = {
             "user_id": 1,
             "name": "Netflix",
             "amount": 30,
-            "type": "expense",
-            "start_date": (getCurrentDate()),
-            "end_date": null,
-            "transactions": []
-        },
-    ],
-
-    // Miscellaneous Section Data
-    MISCELLANEOUS_SECTION_DATA: [
-        {
-            "section": "miscellaneous",
-            "item_id": 10,
-            "user_id": 1,
-            "name": "Gas",
-            "amount": 300,
             "type": "expense",
             "start_date": (getCurrentDate()),
             "end_date": null,

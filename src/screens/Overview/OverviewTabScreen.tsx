@@ -19,7 +19,6 @@ function OverviewTabScreen(): React.JSX.Element {
     return (
         <View style={styles.mainContainer}>
             <ScrollView
-                contentContainerStyle={styles.scrollContentContainer}
                 style={styles.scrollView}
             >
                 <View style={styles.container}>

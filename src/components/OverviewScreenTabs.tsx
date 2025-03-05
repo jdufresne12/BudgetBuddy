@@ -11,7 +11,6 @@ const OveriewScreenTabs = ({ activeTab, setActiveTab }: OverviewScreenTabsProps)
 
   return (
     <View style={styles.container}>
-      {/* Overview Tab Button */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={styles.tabButton}
@@ -27,7 +26,6 @@ const OveriewScreenTabs = ({ activeTab, setActiveTab }: OverviewScreenTabsProps)
         </TouchableOpacity>
       </View>
 
-      {/* Transactions Tab Button */}
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={styles.tabButton}

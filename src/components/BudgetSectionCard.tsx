@@ -13,6 +13,7 @@ import AddBudgetItem from './AddBudgetItem.tsx';
 import EditBudgetItem from './EditBudgetItem.tsx';
 import DeleteSectionModal from './DeleteSectionModal.tsx';
 import ViewTransactionsModal from './ViewTransactionsModal.tsx';
+import { Transaction } from '../api/services/transaction.ts';
 
 interface BudgetSectionProps {
   section: string;
@@ -60,6 +61,12 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
     }
   };
 
+  const isIncome = (item: Transaction | BudgetItem) => {
+    if (item?.type === "income")
+      return true;
+    return false;
+  }
+
   const handleEditItem = (budgetItem: BudgetItem) => {
     setSelectedItem(budgetItem);
     setShowEditItemModal(true);
@@ -95,9 +102,9 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
                     style={styles.budgetItemContainer}
                     onPress={() => handleEditItem(budgetItem)}
                   >
-                    <View style={styles.iconCircle}>
+                    <View style={[styles.iconCircle, { backgroundColor: isIncome(budgetItem) ? colors.income_green : colors.expense_red }]}>
                       <Icon
-                        name='person'
+                        name={isIncome(budgetItem) ? 'bag-add-sharp' : 'bag-remove-sharp'}
                         size={20}
                         color={colors.white}
                       />
