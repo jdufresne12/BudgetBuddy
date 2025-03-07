@@ -21,27 +21,9 @@ interface ModalProps {
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
     section: string;
     budgetItems: BudgetItem[];
-    handleRemoveSection: () => void;
 }
 
-// export interface BudgetItem {
-//     section: string;
-//     item_id: number;
-//     user_id: number | undefined;
-//     name: string;
-//     amount: number;
-//     type: string;
-//     start_date: string;
-//     end_date: string | null
-//     transactions: Transaction[]
-// }
-
-function ViewTransactionsModal({ isVisible, setIsVisible, section, budgetItems, handleRemoveSection }: ModalProps): React.JSX.Element {
-
-    useEffect(() => {
-        console.log(budgetItems);
-    }, [budgetItems])
-
+function ViewTransactionsModal({ isVisible, setIsVisible, section, budgetItems }: ModalProps): React.JSX.Element {
     const calculateTotalSpent = (transactions: Transaction[]) => {
         if (!transactions || transactions.length === 0) {
             return 0;

@@ -13,6 +13,7 @@ import { Dropdown } from 'react-native-element-dropdown';
 import { colors, typography } from '../assets/theme';
 import { getCurrentDate, isValidDateFormat } from '../utils/textFormatting';
 import { useAuth } from '../contexts/AuthContext';
+import { useBudget } from '../contexts/BudgetContext';
 
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
@@ -31,6 +32,8 @@ interface Category {
 
 const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddTransactionModalProps) => {
     const { userData } = useAuth();
+    const { isCurrentMonth, isCurrentYear, addTransaction } = useBudget();
+
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
     const [description, setDescription] = useState<string>('');
@@ -48,15 +51,16 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
         hideDatePicker();
     };
 
-    async function resetData() {
-        setAmount(0);
-        setItemType('expense');
-        setDescription('');
-        setDate(getCurrentDate());
-        setCategory({ name: "", item_id: 0 })
-        setDescriptionError(null);
-        setDateError(null);
-    };
+    const dropdownData = [
+        { name: 'Work', item_id: '1' },
+        { name: 'Rent', item_id: '2' },
+        { name: 'Water', item_id: '3' },
+        { name: 'Groceries', item_id: '4' },
+        { name: 'Eating out', item_id: '5' },
+        { name: 'Gas', item_id: '6' },
+        { name: 'Insurance', item_id: '7' },
+        { name: 'Netflix', item_id: '8' },
+    ];
 
     const handleCancel = async () => {
         await resetData();
@@ -111,7 +115,14 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
                     type: itemType,
                     date: date
                 };
-                console.log(newTransaction);
+
+                /*
+                    TRANSACTION API CALL IN HERE
+                */
+                if (isCurrentMonth(date!) && isCurrentYear(date!)) {
+                    addTransaction(newTransaction);
+                }
+
             } catch (error) {
                 console.error(error);
             } finally {
@@ -121,16 +132,15 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
         }
     };
 
-    const data = [
-        { name: 'Work', item_id: '1' },
-        { name: 'Rent', item_id: '2' },
-        { name: 'Water', item_id: '3' },
-        { name: 'Groceries', item_id: '4' },
-        { name: 'Eating out', item_id: '5' },
-        { name: 'Gas', item_id: '6' },
-        { name: 'Insurance', item_id: '7' },
-        { name: 'Netflix', item_id: '8' },
-    ];
+    async function resetData() {
+        setAmount(0);
+        setItemType('expense');
+        setDescription('');
+        setDate(getCurrentDate());
+        setCategory({ name: "", item_id: 0 })
+        setDescriptionError(null);
+        setDateError(null);
+    };
 
     return (
         <BottomSheet visible={isVisible} handleCancel={handleCancel}>
@@ -198,7 +208,7 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         itemTextStyle={styles.itemTextStyle}
-                        data={data}
+                        data={dropdownData}
                         maxHeight={200}
                         labelField="name"
                         valueField="item_id"

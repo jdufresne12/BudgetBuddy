@@ -61,7 +61,7 @@ const transactionMockData = {
 export const sectionMockData = {
     INCOME_SECTION_DATA: [
         {
-            "section": "income",
+            "section": "Income",
             "item_id": 1,
             "user_id": 1,
             "name": "Work",
@@ -74,7 +74,7 @@ export const sectionMockData = {
     ],
     HOME_SECTION_DATA: [
         {
-            "section": "home",
+            "section": "Home",
             "item_id": 2,
             "user_id": 1,
             "name": "Rent",
@@ -85,7 +85,7 @@ export const sectionMockData = {
             "transactions": transactionMockData.RENT_TRANSACTION
         },
         {
-            "section": "home",
+            "section": "Home",
             "item_id": 3,
             "user_id": 1,
             "name": "Water",
@@ -98,7 +98,7 @@ export const sectionMockData = {
     ],
     FOOD_SECTION_DATA: [
         {
-            "section": "food",
+            "section": "Food",
             "item_id": 4,
             "user_id": 1,
             "name": "Groceries",
@@ -109,7 +109,7 @@ export const sectionMockData = {
             "transactions": transactionMockData.FOOD_TRANSACTIONS
         },
         {
-            "section": "food",
+            "section": "Food",
             "item_id": 5,
             "user_id": 1,
             "name": "Eating out",
@@ -122,7 +122,7 @@ export const sectionMockData = {
     ],
     TRANSPORTATION_SECTION_DATA: [
         {
-            "section": "transportation",
+            "section": "Transportation",
             "item_id": 6,
             "user_id": 1,
             "name": "Gas",
@@ -133,7 +133,7 @@ export const sectionMockData = {
             "transactions": []
         },
         {
-            "section": "transportation",
+            "section": "Transportation",
             "item_id": 7,
             "user_id": 1,
             "name": "Insurance",
@@ -146,7 +146,7 @@ export const sectionMockData = {
     ],
     SUBSCRIPTION_SECTION_DATA: [
         {
-            "section": "subscription",
+            "section": "Subscriptions",
             "item_id": 8,
             "user_id": 1,
             "name": "Netflix",

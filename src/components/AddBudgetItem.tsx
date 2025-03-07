@@ -19,17 +19,22 @@ import AmountInput from './AmountInput';
 import { CreateBudgetItemData, BudgetItem } from '../api/services/budget';
 import { BudgetState } from '../screens/Budget/BudgetTabScreen';
 import { SectionName } from '../api/services/section';
+import { useBudget } from '../contexts/BudgetContext';
 
 interface AddBudgetItemProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
     section: string;
     setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
+    currentMonth: number;
+    currentYear: number;
     handleAddedItem: () => void;
 }
 
-const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, handleAddedItem }: AddBudgetItemProps) => {
+const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, currentMonth, currentYear, handleAddedItem }: AddBudgetItemProps) => {
     const { userData } = useAuth();
+    const { budget, curMonth, curYear, addBudgetItem } = useBudget();
+
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
     const [name, setName] = useState<string>('');
@@ -122,13 +127,26 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, handl
                     "end_date": endDate,
                     "transactions": []
                 }
-                setBudgetState((prevState) => ({
-                    ...prevState,
-                    sections: {
-                        ...prevState.sections,
-                        [section as SectionName]: [...prevState.sections[section as SectionName], newItem],
-                    },
-                }));
+
+                console.log(curMonth);
+                console.log(currentMonth);
+
+                if (curMonth === currentMonth && curYear === currentYear) {
+                    const updatedBudget = addBudgetItem(newItem);
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: updatedBudget,
+                    }));
+                }
+                else {
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: {
+                            ...prevState.sections,
+                            [section as SectionName]: [...prevState.sections[section as SectionName], newItem],
+                        },
+                    }));
+                }
 
                 handleAddedItem();
             } catch (error) {

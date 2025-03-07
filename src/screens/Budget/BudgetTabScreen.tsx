@@ -20,26 +20,21 @@ import { useAuth } from "../../contexts/AuthContext.tsx";
 import { BudgetItem } from "../../api/services/budget.ts";
 
 import { sectionMockData } from "../../utils/mockData.ts";
+import { Budget, useBudget } from "../../contexts/BudgetContext.tsx";
 
 export interface BudgetState {
-    sections: Record<SectionName, BudgetItem[]>;
+    sections: Budget;
     currentMonth: number;
     currentYear: number;
 }
 
 function BudgetTabScreen(): React.JSX.Element {
     const { userData } = useAuth();
+    const { budget, isCurrentMonth, isCurrentYear } = useBudget()
 
     const mockDataOn = true;
     const [budgetState, setBudgetState] = useState<BudgetState>({
-        sections: {
-            Income: mockDataOn ? sectionMockData.INCOME_SECTION_DATA : [],
-            Home: mockDataOn ? sectionMockData.HOME_SECTION_DATA : [],
-            Food: mockDataOn ? sectionMockData.FOOD_SECTION_DATA : [],
-            Transportation: mockDataOn ? sectionMockData.TRANSPORTATION_SECTION_DATA : [],
-            Subscriptions: mockDataOn ? sectionMockData.SUBSCRIPTION_SECTION_DATA : [],
-            Other: [],
-        },
+        sections: budget,
         currentMonth: new Date().getMonth(),
         currentYear: new Date().getFullYear()
     });
@@ -162,6 +157,8 @@ function BudgetTabScreen(): React.JSX.Element {
                                         section={sectionName}
                                         budgetItems={budgetItems}
                                         setBudgetState={setBudgetState}
+                                        currentMonth={currentMonth}
+                                        currentYear={currentYear}
                                     />
                                 )}
                             </View>

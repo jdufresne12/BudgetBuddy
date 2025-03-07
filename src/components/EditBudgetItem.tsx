@@ -19,6 +19,7 @@ import AmountInput from './AmountInput';
 import { CreateBudgetItemData, BudgetItem } from '../api/services/budget';
 import { BudgetState } from '../screens/Budget/BudgetTabScreen';
 import { SectionName } from '../api/services/section';
+import { useBudget } from '../contexts/BudgetContext';
 
 interface EditBudgetItemProps {
     isVisible: boolean;
@@ -26,11 +27,15 @@ interface EditBudgetItemProps {
     section: string;
     budgetItem: BudgetItem | null;
     setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
+    currentMonth: number;
+    currentYear: number;
     handleUpdateItem: () => void;
 }
 
-const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudgetState, handleUpdateItem }: EditBudgetItemProps) => {
+const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudgetState, currentMonth, currentYear, handleUpdateItem }: EditBudgetItemProps) => {
     const { userData } = useAuth();
+    const { budget, curMonth, curYear, updateBudgetItem, removeBudgetItem } = useBudget();
+
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
     const [name, setName] = useState<string>('');
@@ -109,30 +114,43 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
         if (isValid && budgetItem) {
             try {
                 const data: BudgetItem = {
-                    item_id: budgetItem.item_id,
-                    section: section,
-                    user_id: userData?.user_id,
-                    name: name,
-                    amount: amount,
-                    type: itemType,
-                    start_date: budgetItem.start_date,
-                    end_date: endDate,
-                    transactions: [],
+                    "item_id": budgetItem.item_id,
+                    "section": section,
+                    "user_id": userData?.user_id,
+                    "name": name,
+                    "amount": amount,
+                    "type": itemType,
+                    "start_date": budgetItem.start_date,
+                    "end_date": endDate,
+                    "transactions": budgetItem.transactions,
                 };
                 // const response = await budgetAPI.updateBudgetItem(data);
                 // if (response) {
                 //     handleUpdateItem();
                 // }
 
-                setBudgetState((prevState) => ({
-                    ...prevState,
-                    sections: {
-                        ...prevState.sections,
-                        [section as SectionName]: prevState.sections[section as SectionName].map(
-                            (item) => item.item_id === data.item_id ? data : item
-                        )
-                    }
-                }))
+
+                if (curMonth === currentMonth && curYear === currentYear) {
+                    const updatedBudget = updateBudgetItem(data);
+                    console.log("budgetItemData")
+                    console.log(updatedBudget)
+
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: updatedBudget,
+                    }));
+                }
+                else {
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: {
+                            ...prevState.sections,
+                            [section as SectionName]: prevState.sections[section as SectionName].map(
+                                (item) => item.item_id === data.item_id ? data : item
+                            )
+                        }
+                    }))
+                }
 
             } catch (error) {
                 console.error(error);
@@ -155,15 +173,25 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
                 // if (response) {
                 //     handleUpdateItem();
                 // }
-                setBudgetState((prevState) => ({
-                    ...prevState,
-                    sections: {
-                        ...prevState.sections,
-                        [section as SectionName]: prevState.sections[section as SectionName].filter(
-                            (item) => item.item_id !== data.item_id
-                        )
-                    }
-                }))
+
+                if (curMonth === currentMonth && curYear === currentYear) {
+                    const updatedBudget = removeBudgetItem(data);
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: updatedBudget,
+                    }));
+                }
+                else {
+                    setBudgetState((prevState) => ({
+                        ...prevState,
+                        sections: {
+                            ...prevState.sections,
+                            [section as SectionName]: prevState.sections[section as SectionName].filter(
+                                (item) => item.item_id !== data.item_id
+                            )
+                        }
+                    }))
+                }
             } catch (error) {
                 console.error(error);
             } finally {

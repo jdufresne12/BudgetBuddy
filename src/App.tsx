@@ -3,6 +3,7 @@ import { enableScreens } from 'react-native-screens';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthNavigator } from './navigation/AuthNavigator';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { BudgetProvider } from './contexts/BudgetContext';
 import { NavigationContainer } from '@react-navigation/native';
 import { TabNavigator } from './navigation/TabNavigator';
 import { LoadingScreen } from './screens/LoadingScreen';
@@ -21,11 +22,13 @@ export default function App(): React.JSX.Element {
     <SafeAreaProvider>
       <LoadingProvider>
         <AuthProvider>
-          <NavigationContainer>
-            <LoadingScreen>
-              <Navigation />
-            </LoadingScreen>
-          </NavigationContainer>
+          <BudgetProvider>
+            <NavigationContainer>
+              <LoadingScreen>
+                <Navigation />
+              </LoadingScreen>
+            </NavigationContainer>
+          </BudgetProvider>
         </AuthProvider>
       </LoadingProvider>
     </SafeAreaProvider>

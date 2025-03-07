@@ -19,9 +19,11 @@ interface BudgetSectionProps {
   section: string;
   budgetItems: BudgetItem[];
   setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
+  currentMonth: number
+  currentYear: number
 }
 
-function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSectionProps): React.JSX.Element {
+function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth, currentYear }: BudgetSectionProps): React.JSX.Element {
   const { userData } = useAuth();
   const [showAddItemModal, setShowAddItemModal] = useState(false);
   const [showEditItemModal, setShowEditItemModal] = useState(false);
@@ -143,6 +145,8 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
         setIsVisible={setShowAddItemModal}
         section={section}
         setBudgetState={setBudgetState}
+        currentMonth={currentMonth}
+        currentYear={currentYear}
         handleAddedItem={getItems}
       />
 
@@ -152,6 +156,8 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
         section={section}
         budgetItem={selectedItem}
         setBudgetState={setBudgetState}
+        currentMonth={currentMonth}
+        currentYear={currentYear}
         handleUpdateItem={getItems}
       />
 
@@ -166,7 +172,6 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState }: BudgetSecti
         setIsVisible={setShowTransactionModal}
         section={section}
         budgetItems={budgetItems}
-        handleRemoveSection={() => { }}
       />
 
     </TouchableOpacity>
