@@ -29,10 +29,9 @@ interface EditBudgetItemProps {
     setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
     currentMonth: number;
     currentYear: number;
-    handleUpdateItem: () => void;
 }
 
-const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudgetState, currentMonth, currentYear, handleUpdateItem }: EditBudgetItemProps) => {
+const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudgetState, currentMonth, currentYear }: EditBudgetItemProps) => {
     const { userData } = useAuth();
     const { budget, curMonth, curYear, updateBudgetItem, removeBudgetItem } = useBudget();
 
@@ -51,12 +50,12 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
             setName(budgetItem.name);
             setEndDate(budgetItem.end_date);
         }
-    }, [budgetItem]);
+    }, [isVisible]);
 
     const showDatePicker = () => { setDatePickerVisibility(true) };
     const hideDatePicker = () => { setDatePickerVisibility(false) };
 
-    async function resetData() {
+    function resetData() {
         setAmount(0);
         setItemType('expense');
         setName('')
@@ -71,8 +70,8 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
         hideDatePicker();
     };
 
-    const handleCancel = async () => {
-        await resetData();
+    const handleCancel = () => {
+        resetData();
         setIsVisible(false)
     };
 
@@ -124,34 +123,31 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
                     "end_date": endDate,
                     "transactions": budgetItem.transactions,
                 };
-                // const response = await budgetAPI.updateBudgetItem(data);
-                // if (response) {
-                //     handleUpdateItem();
-                // }
 
+                const response = await budgetAPI.updateBudgetItem(data);
+                if (response) {
+                    if (curMonth === currentMonth && curYear === currentYear) {
+                        const updatedBudget = updateBudgetItem(data);
+                        console.log("budgetItemData")
+                        console.log(updatedBudget)
 
-                if (curMonth === currentMonth && curYear === currentYear) {
-                    const updatedBudget = updateBudgetItem(data);
-                    console.log("budgetItemData")
-                    console.log(updatedBudget)
-
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: updatedBudget,
-                    }));
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: updatedBudget,
+                        }));
+                    }
+                    else {
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: {
+                                ...prevState.sections,
+                                [section as SectionName]: prevState.sections[section as SectionName].map(
+                                    (item) => item.item_id === data.item_id ? data : item
+                                )
+                            }
+                        }))
+                    }
                 }
-                else {
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: {
-                            ...prevState.sections,
-                            [section as SectionName]: prevState.sections[section as SectionName].map(
-                                (item) => item.item_id === data.item_id ? data : item
-                            )
-                        }
-                    }))
-                }
-
             } catch (error) {
                 console.error(error);
             } finally {
@@ -169,28 +165,26 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
                     user_id: userData?.user_id,
                     section: section
                 };
-                // const response = await budgetAPI.deleteBudgetItem(data);
-                // if (response) {
-                //     handleUpdateItem();
-                // }
-
-                if (curMonth === currentMonth && curYear === currentYear) {
-                    const updatedBudget = removeBudgetItem(data);
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: updatedBudget,
-                    }));
-                }
-                else {
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: {
-                            ...prevState.sections,
-                            [section as SectionName]: prevState.sections[section as SectionName].filter(
-                                (item) => item.item_id !== data.item_id
-                            )
-                        }
-                    }))
+                const response = await budgetAPI.deleteBudgetItem(data);
+                if (response) {
+                    if (curMonth === currentMonth && curYear === currentYear) {
+                        const updatedBudget = removeBudgetItem(data);
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: updatedBudget,
+                        }));
+                    }
+                    else {
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: {
+                                ...prevState.sections,
+                                [section as SectionName]: prevState.sections[section as SectionName].filter(
+                                    (item) => item.item_id !== data.item_id
+                                )
+                            }
+                        }))
+                    }
                 }
             } catch (error) {
                 console.error(error);

@@ -1,8 +1,9 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { SectionData, SectionName } from '../api/services/section';
-import { BudgetItem, DeleteBudgetItemData } from '../api/services/budget';
+import { budgetAPI, BudgetItem, DeleteBudgetItemData, GetBudgetData } from '../api/services/budget';
 import { CreateTransactionData, Transaction } from '../api/services/transaction';
 import { sectionMockData } from '../utils/mockData';
+import { useAuth } from './AuthContext';
 
 export interface Budget {
     Income: BudgetItem[];
@@ -16,10 +17,11 @@ interface BudgetContextType {
     budget: Budget;
     curMonth: number;
     curYear: number;
-    addTransaction: (transactionData: CreateTransactionData) => void;
+    addTransaction: (transactionData: Transaction) => void;
     addBudgetItem: (newBudgetItemData: BudgetItem) => Budget;
     updateBudgetItem: (newBudgetItemData: BudgetItem) => Budget;
     removeBudgetItem: (deleteItemData: DeleteBudgetItemData) => Budget;
+    dataToBudget: (budgetData: any) => Budget
     isCurrentMonth: (date: string) => Boolean;
     isCurrentYear: (date: string) => Boolean;
 }
@@ -31,7 +33,8 @@ interface BudgetProviderProps {
 const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
 
 export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
-    const mockDataOn = true;
+    const { userData } = useAuth();
+    const mockDataOn = false;
     const curMonth = new Date().getMonth();
     const curYear = new Date().getFullYear();
     const [budget, setBudget] = useState<Budget>({
@@ -47,12 +50,59 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
         console.log(budget)
     }, [budget])
 
+    useEffect(() => {
+        const getBudget = async () => {
+            try {
+                const data: GetBudgetData = {
+                    'user_id': userData?.user_id,
+                    'month': curMonth + 1,
+                    'year': curYear
+                };
+                const response: BudgetItem[] = await budgetAPI.getBudget(data);
+                console.log(response)
+                setBudget(dataToBudget(response));
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        if (userData?.user_id) {
+            getBudget();
+        }
+    }, [userData?.user_id, curMonth, curYear])
+
+    /**
+     * Parses returned budget data from get_budget API and returns a new Budget object with said data
+     * @param budgetData -> BudgetItem[]
+     * @returns budget
+     */
+    const dataToBudget = (budgetData: any) => {
+        let newBudget: Budget = {
+            Income: [],
+            Home: [],
+            Food: [],
+            Transportation: [],
+            Subscriptions: [],
+        };
+
+        budgetData.forEach((item: BudgetItem) => {
+            if (item.section in newBudget) {
+                newBudget[item.section as SectionName].push(item);
+            }
+            else {
+                console.warn(`Unknown section: ${item.section}`);
+            }
+        });
+
+        return newBudget;
+    };
+
     /**
      * Adds a transaction to a budget item within the Context Budget
      * @param newTransactionData 
      * @returns 
      */
-    const addTransaction = (newTransactionData: CreateTransactionData) => {
+    const addTransaction = (newTransactionData: Transaction) => {
         let sectionName: keyof Budget | undefined;
         const budgetItemArray = Object.values(budget).flat();
         for (let i = 0; i < budgetItemArray.length; i++) {
@@ -165,6 +215,7 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
         addBudgetItem,
         updateBudgetItem,
         removeBudgetItem,
+        dataToBudget,
         isCurrentMonth,
         isCurrentYear
     };

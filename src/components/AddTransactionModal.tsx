@@ -17,7 +17,8 @@ import { useBudget } from '../contexts/BudgetContext';
 
 import BottomSheet from './BottomSheet';
 import AmountInput from './AmountInput';
-import { CreateTransactionData, Transaction } from '../api/services/transaction';
+import { CreateTransactionData, Transaction, transactionAPI } from '../api/services/transaction';
+import { budgetAPI, Category } from '../api/services/budget';
 
 interface AddTransactionModalProps {
     isVisible: boolean;
@@ -25,9 +26,9 @@ interface AddTransactionModalProps {
     handleUpdateItem: () => void;
 }
 
-interface Category {
+interface Categories {
     name: string;
-    item_id: number | null;
+    item_id: string | undefined;
 }
 
 const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddTransactionModalProps) => {
@@ -39,6 +40,7 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
     const [description, setDescription] = useState<string>('');
     const [descriptionError, setDescriptionError] = useState<string | null>(null);
     const [category, setCategory] = useState<Category>({ name: "", item_id: 0 });
+    const [categories, setCategories] = useState<Categories[]>([]);
     const [date, setDate] = useState<string | null>(getCurrentDate());
     const [dateError, setDateError] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState<boolean>(false);
@@ -51,16 +53,27 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
         hideDatePicker();
     };
 
-    const dropdownData = [
-        { name: 'Work', item_id: '1' },
-        { name: 'Rent', item_id: '2' },
-        { name: 'Water', item_id: '3' },
-        { name: 'Groceries', item_id: '4' },
-        { name: 'Eating out', item_id: '5' },
-        { name: 'Gas', item_id: '6' },
-        { name: 'Insurance', item_id: '7' },
-        { name: 'Netflix', item_id: '8' },
-    ];
+    useEffect(() => {
+        async function loadCategories() {
+            try {
+                const response = await budgetAPI.getAllCategories({ "user_id": userData?.user_id });
+                console.log(response);
+
+                const formattedCategories = response.map(item => ({
+                    ...item,
+                    item_id: item.item_id?.toString()
+                }));
+
+                setCategories(formattedCategories);
+            } catch (error) {
+                console.error("Error loading categories:", error);
+            }
+        }
+
+        if (userData?.user_id) {
+            loadCategories();
+        }
+    }, [userData?.user_id]);
 
     const handleCancel = async () => {
         await resetData();
@@ -116,13 +129,13 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
                     date: date
                 };
 
-                /*
-                    TRANSACTION API CALL IN HERE
-                */
-                if (isCurrentMonth(date!) && isCurrentYear(date!)) {
-                    addTransaction(newTransaction);
+                const response = await transactionAPI.createTransaction(newTransaction);
+                if (response) {
+                    if (isCurrentMonth(date!) && isCurrentYear(date!)) {
+                        console.log("Here")
+                        addTransaction(response);
+                    }
                 }
-
             } catch (error) {
                 console.error(error);
             } finally {
@@ -208,7 +221,7 @@ const AddTransactionModal = ({ isVisible, setIsVisible, handleUpdateItem }: AddT
                         placeholderStyle={styles.placeholderStyle}
                         selectedTextStyle={styles.selectedTextStyle}
                         itemTextStyle={styles.itemTextStyle}
-                        data={dropdownData}
+                        data={categories as any}
                         maxHeight={200}
                         labelField="name"
                         valueField="item_id"

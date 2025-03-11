@@ -5,7 +5,7 @@ import { typography, colors } from '../assets/theme.ts';
 import { formatToDollar } from '../utils/textFormatting.ts';
 import { BudgetState } from '../screens/Budget/BudgetTabScreen.tsx';
 import { DeleteSectionData, sectionAPI, SectionData } from '../api/services/section.ts';
-import { budgetAPI, BudgetItem, GetSectionsItemsData } from '../api/services/budget';
+import { budgetAPI, BudgetItem } from '../api/services/budget';
 
 import { useAuth } from '../contexts/AuthContext.tsx';
 
@@ -30,38 +30,6 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth,
   const [showDeleteSectionModal, setShowDeleteSectionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState<BudgetItem | null>(null);
   const [showTransactionModal, setShowTransactionModal] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   getItems();
-  // }, []);
-
-  const getItems = async () => {
-    try {
-      const data: GetSectionsItemsData = {
-        'user_id': userData?.user_id,
-        'section': section,
-      };
-      // const response: BudgetItem[] = await budgetAPI.getSectionsItems(data);
-
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleRemoveSection = async () => {
-    // Currently not being used
-    try {
-      const data: DeleteSectionData = {
-        'user_id': userData?.user_id,
-        'section': section
-      }
-      // const response = await sectionAPI.deleteSection(data)
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setShowDeleteSectionModal(false);
-    }
-  };
 
   const isIncome = (item: Transaction | BudgetItem) => {
     if (item?.type === "income")
@@ -147,7 +115,6 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth,
         setBudgetState={setBudgetState}
         currentMonth={currentMonth}
         currentYear={currentYear}
-        handleAddedItem={getItems}
       />
 
       <EditBudgetItem
@@ -158,14 +125,7 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth,
         setBudgetState={setBudgetState}
         currentMonth={currentMonth}
         currentYear={currentYear}
-        handleUpdateItem={getItems}
       />
-
-      {/* <DeleteSectionModal
-        isVisible={showDeleteSectionModal}
-        setIsVisible={setShowDeleteSectionModal}
-        handleRemoveSection={handleRemoveSection}
-      /> */}
 
       <ViewTransactionsModal
         isVisible={showTransactionModal}
@@ -173,6 +133,12 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth,
         section={section}
         budgetItems={budgetItems}
       />
+
+      {/* <DeleteSectionModal
+        isVisible={showDeleteSectionModal}
+        setIsVisible={setShowDeleteSectionModal}
+        handleRemoveSection={handleRemoveSection}
+      /> */}
 
     </TouchableOpacity>
   );

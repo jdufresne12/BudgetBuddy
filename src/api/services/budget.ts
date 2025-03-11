@@ -30,10 +30,21 @@ export interface DeleteBudgetItemData {
     item_id: number;
 }
 
-export interface GetSectionsItemsData {
-    section: string;
+export interface GetBudgetData {
+    user_id: number | undefined;
+    month: number;
+    year: number;
+}
+
+export interface GetCategoriesData {
     user_id: number | undefined;
 }
+
+export interface Category {
+    item_id: number | undefined;
+    name: string;
+}
+
 
 export const budgetAPI = {
     createBudgetItem: async (data: CreateBudgetItemData) => {
@@ -64,15 +75,25 @@ export const budgetAPI = {
                 ('/budget/update_budget_item', data)
             return response.data;
         } catch (error) {
+            return handleApiError(error);
+        }
+    },
+
+    getBudget: async (data: GetBudgetData) => {
+        try {
+            const response = await apiClient.post<BudgetItem[]>
+                ('/budget/get_budget', data)
+            return response.data;
+        } catch (error) {
             handleApiError(error);
             throw error;
         }
     },
 
-    getSectionsItems: async (data: GetSectionsItemsData) => {
+    getAllCategories: async (data: GetCategoriesData) => {
         try {
-            const response = await apiClient.post<BudgetItem[]>
-                ('/budget/get_sections_items', data)
+            const response = await apiClient.post<Category[]>
+                ('/budget/get_all_categories', data)
             return response.data;
         } catch (error) {
             handleApiError(error);

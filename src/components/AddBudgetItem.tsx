@@ -28,10 +28,9 @@ interface AddBudgetItemProps {
     setBudgetState: React.Dispatch<React.SetStateAction<BudgetState>>;
     currentMonth: number;
     currentYear: number;
-    handleAddedItem: () => void;
 }
 
-const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, currentMonth, currentYear, handleAddedItem }: AddBudgetItemProps) => {
+const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, currentMonth, currentYear }: AddBudgetItemProps) => {
     const { userData } = useAuth();
     const { budget, curMonth, curYear, addBudgetItem } = useBudget();
 
@@ -103,52 +102,46 @@ const AddBudgetItem = ({ isVisible, setIsVisible, section, setBudgetState, curre
 
         if (isValid) {
             try {
-                // const data: CreateBudgetItemData = {
-                //     "section": section,
-                //     "user_id": userData?.user_id,
-                //     "name": name,
-                //     "amount": amount,
-                //     "type": itemType,
-                //     "start_date": getCurrentDate(),
-                //     "end_date": endDate
-                // }
-                // const response = await budgetAPI.createBudgetItem(data);
-                // if (response) {
-                //     handleAddedItem();
-                // }
-                const newItem: BudgetItem = {
+                const data: CreateBudgetItemData = {
                     "section": section,
                     "user_id": userData?.user_id,
-                    "item_id": 0,
                     "name": name,
                     "amount": amount,
                     "type": itemType,
                     "start_date": getCurrentDate(),
-                    "end_date": endDate,
-                    "transactions": []
+                    "end_date": endDate
                 }
+                const response: BudgetItem = await budgetAPI.createBudgetItem(data);
+                if (response) {
+                    const newItem: BudgetItem = {
+                        "section": section,
+                        "user_id": userData?.user_id,
+                        "item_id": response.item_id,
+                        "name": name,
+                        "amount": amount,
+                        "type": itemType,
+                        "start_date": getCurrentDate(),
+                        "end_date": endDate,
+                        "transactions": []
+                    }
 
-                console.log(curMonth);
-                console.log(currentMonth);
-
-                if (curMonth === currentMonth && curYear === currentYear) {
-                    const updatedBudget = addBudgetItem(newItem);
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: updatedBudget,
-                    }));
+                    if (curMonth === currentMonth && curYear === currentYear) {
+                        const updatedBudget = addBudgetItem(newItem);
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: updatedBudget,
+                        }));
+                    }
+                    else {
+                        setBudgetState((prevState) => ({
+                            ...prevState,
+                            sections: {
+                                ...prevState.sections,
+                                [section as SectionName]: [...prevState.sections[section as SectionName], newItem],
+                            },
+                        }));
+                    }
                 }
-                else {
-                    setBudgetState((prevState) => ({
-                        ...prevState,
-                        sections: {
-                            ...prevState.sections,
-                            [section as SectionName]: [...prevState.sections[section as SectionName], newItem],
-                        },
-                    }));
-                }
-
-                handleAddedItem();
             } catch (error) {
                 console.error(error);
             } finally {
