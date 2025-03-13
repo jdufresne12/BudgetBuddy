@@ -16,10 +16,6 @@ import TransactionCard from '../../components/TransactionCard.tsx';
 function TransactionScreen(): React.JSX.Element {
   const { transactions } = useBudget();
 
-  useEffect(() => {
-    console.log(transactions)
-  }, [transactions])
-
   return (
     <View style={styles.container}>
       {transactions.length > 0

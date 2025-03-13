@@ -7,11 +7,55 @@ import {
 import * as Progress from 'react-native-progress';
 import { typography, colors } from '../assets/theme.ts';
 import { formatToDollar } from "../utils/textFormatting.ts";
+import { useBudget } from "../contexts/BudgetContext.tsx";
+import { BudgetItem } from "../api/services/budget.ts";
+import { Transaction } from "../api/services/transaction.ts";
 
 function RemainingBudget(): React.JSX.Element {
-    const [remainingBudget, setRemainingBudget] = useState<number>(500);
-    const [budget, setBudget] = useState<number>(1500);
-    const [amountSpent, setAmountSpent] = useState<number>(300);
+    const { budget } = useBudget();
+
+    const [curBudget, setCurBudget] = useState<number>(0);
+    const [amountSpent, setAmountSpent] = useState<number>(0);
+    const [progress, setProgress] = useState<number>(0);
+
+    useEffect(() => {
+        setAmountSpent(calculateAmountSpent());
+        setCurBudget(calculateCurBudget());
+    }, [budget])
+
+    useEffect(() => {
+        setProgress(amountSpent / curBudget);
+    }, [curBudget, amountSpent])
+
+    function calculateCurBudget() {
+        let totalExpenses = 0;
+
+        Object.values(budget).forEach(category => {
+            category.forEach((budgetItem: BudgetItem) => {
+                if (budgetItem.type === 'expense') {
+                    totalExpenses += budgetItem.amount;
+                }
+            });
+        });
+        return totalExpenses;
+    }
+    function calculateAmountSpent() {
+        let totalSpent = 0;
+
+        Object.values(budget).forEach(category => {
+            category.forEach((budgetItem: BudgetItem) => {
+                if (budgetItem.type === 'expense') {
+                    budgetItem.transactions.forEach((transaction: Transaction) => {
+                        if (transaction.type === 'expense')
+                            totalSpent += transaction.amount;
+                        else
+                            totalSpent -= transaction.amount;
+                    });
+                }
+            });
+        });
+        return totalSpent;
+    }
 
     return (
         <View style={styles.container}>
@@ -20,23 +64,25 @@ function RemainingBudget(): React.JSX.Element {
             </View>
 
             <View style={styles.leftToSpendContainer}>
-                <Text style={[styles.leftToSpendText, { paddingBottom: -10 }]}>LEFT TO SPEND</Text>
+                <Text style={styles.leftToSpendText}>LEFT TO SPEND</Text>
             </View>
 
             <View style={styles.budgetContainer}>
-                <Text style={styles.budgetText}>{formatToDollar(remainingBudget)}</Text>
+                <Text style={styles.budgetText}>{formatToDollar(curBudget - amountSpent)}</Text>
                 <View style={styles.progressBar}>
                     <Progress.Bar
-                        progress={amountSpent / budget}
+                        progress={progress}
                         width={300}
+                        height={10}
                         borderWidth={0}
                         color={colors.primary}
                         unfilledColor={colors.secondary}
+                        animated={false}
                     />
                 </View>
                 <Text style={styles.leftToSpendText}>
                     OF YOUR
-                    <Text style={styles.spentText}>{` ${formatToDollar(budget)} `}</Text>
+                    <Text style={styles.spentText}>{` ${formatToDollar(curBudget)} `}</Text>
                     BUDGET
                 </Text>
             </View>
@@ -60,8 +106,10 @@ const styles = StyleSheet.create({
         fontWeight: typography.fontWeights.heavy,
         fontSize: typography.sizes.header,
         letterSpacing: 0.5,
+        marginLeft: -1
     },
     leftToSpendContainer: {
+        marginTop: -5,
         paddingLeft: 30,
         paddingBottom: 5,
     },
@@ -73,6 +121,7 @@ const styles = StyleSheet.create({
         color: colors.inactive
     },
     budgetContainer: {
+        marginTop: -10,
         paddingLeft: 30,
     },
     budgetText: {

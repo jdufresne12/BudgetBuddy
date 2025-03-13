@@ -7,16 +7,30 @@ import {
   Text,
   View
 } from "react-native";
+import {
+  LineChart,
+  BarChart,
+  PieChart,
+  ProgressChart,
+  ContributionGraph,
+  StackedBarChart
+} from "react-native-chart-kit";
 import { colors } from '../../assets/theme.ts'
+import { useBudget } from "../../contexts/BudgetContext.tsx";
 import RemainingBudget from "../../components/RemainingBudget.tsx";
+import SpendingTimelineChart from "../../components/SpendingTimelineChart.tsx";
 
 function OverviewScreen(): React.JSX.Element {
+  const { budget } = useBudget();
 
   return (
     <View style={styles.container}>
       {/* Remaining Budget */}
       <View style={styles.budgetContainer}>
         <RemainingBudget />
+      </View>
+      <View style={styles.budgetContainer}>
+        <SpendingTimelineChart />
       </View>
     </View>
   )
@@ -30,10 +44,10 @@ const styles = StyleSheet.create({
   },
   budgetContainer: {
     flexDirection: 'row',
-    flex: 1,
     alignSelf: 'center',
     marginTop: 10,
     width: '90%',
+    minHeight: 100,
     backgroundColor: 'white',
     borderRadius: 10,
     ...Platform.select({
