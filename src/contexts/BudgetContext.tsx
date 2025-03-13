@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { SectionData, SectionName } from '../api/services/section';
-import { budgetAPI, BudgetItem, DeleteBudgetItemData, GetBudgetData } from '../api/services/budget';
-import { CreateTransactionData, Transaction } from '../api/services/transaction';
+import { budgetAPI, BudgetItem, Category, DeleteBudgetItemData, GetBudgetData } from '../api/services/budget';
+import { CreateTransactionData, Transaction, transactionAPI } from '../api/services/transaction';
 import { sectionMockData } from '../utils/mockData';
 import { useAuth } from './AuthContext';
 
@@ -15,13 +15,20 @@ export interface Budget {
 
 interface BudgetContextType {
     budget: Budget;
+    transactions: Transaction[];
+    categories: Category[];
     curMonth: number;
     curYear: number;
-    addTransaction: (transactionData: Transaction) => void;
     addBudgetItem: (newBudgetItemData: BudgetItem) => Budget;
     updateBudgetItem: (newBudgetItemData: BudgetItem) => Budget;
     removeBudgetItem: (deleteItemData: DeleteBudgetItemData) => Budget;
-    dataToBudget: (budgetData: any) => Budget
+    dataToBudget: (budgetData: any) => Budget;
+    addTransaction: (transactionData: Transaction) => void;
+    addToTransactions: (transactionData: Transaction) => void;
+    updateTransaction: (transactionData: Transaction) => void;
+    updateTransactions: (transactionData: Transaction) => void;
+    deleteTransaction: (transactionData: Transaction) => void;
+    deleteFromTransactions: (transactionData: Transaction) => void;
     isCurrentMonth: (date: string) => Boolean;
     isCurrentYear: (date: string) => Boolean;
 }
@@ -44,32 +51,57 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
         Transportation: mockDataOn ? sectionMockData.TRANSPORTATION_SECTION_DATA : [],
         Subscriptions: mockDataOn ? sectionMockData.SUBSCRIPTION_SECTION_DATA : [],
     });
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
-        console.log("BUDGET UPDATED")
-        console.log(budget)
-    }, [budget])
-
-    useEffect(() => {
-        const getBudget = async () => {
-            try {
-                const data: GetBudgetData = {
-                    'user_id': userData?.user_id,
-                    'month': curMonth + 1,
-                    'year': curYear
-                };
-                const response: BudgetItem[] = await budgetAPI.getBudget(data);
-                console.log(response)
-                setBudget(dataToBudget(response));
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
         if (userData?.user_id) {
             getBudget();
+            getTransactions();
+            getCategories();
         }
-    }, [userData?.user_id, curMonth, curYear])
+    }, [userData?.user_id])
+
+    const getBudget = async () => {
+        try {
+            const data: GetBudgetData = {
+                'user_id': userData?.user_id,
+                'month': curMonth + 1,
+                'year': curYear
+            };
+            const response: BudgetItem[] = await budgetAPI.getBudget(data);
+            setBudget(dataToBudget(response));
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getTransactions = async () => {
+        try {
+            const data = { "user_id": userData?.user_id }
+            const response: Transaction[] = await transactionAPI.getAllTransactions(data);
+            if (response) {
+                const sortedTransactions = response.sort((a, b) => Date.parse(b.date!) - Date.parse(a.date!));
+                setTransactions(sortedTransactions);
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    const getCategories = async () => {
+        try {
+            const response = await budgetAPI.getAllCategories({ "user_id": userData?.user_id });
+            const formattedCategories = response.map(item => ({
+                ...item,
+                item_id: item.item_id?.toString()
+            }));
+
+            setCategories(formattedCategories);
+        } catch (error) {
+            console.error("Error loading categories:", error);
+        }
+    }
 
     /**
      * Parses returned budget data from get_budget API and returns a new Budget object with said data
@@ -84,7 +116,6 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
             Transportation: [],
             Subscriptions: [],
         };
-
         budgetData.forEach((item: BudgetItem) => {
             if (item.section in newBudget) {
                 newBudget[item.section as SectionName].push(item);
@@ -93,37 +124,7 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
                 console.warn(`Unknown section: ${item.section}`);
             }
         });
-
         return newBudget;
-    };
-
-    /**
-     * Adds a transaction to a budget item within the Context Budget
-     * @param newTransactionData 
-     * @returns 
-     */
-    const addTransaction = (newTransactionData: Transaction) => {
-        let sectionName: keyof Budget | undefined;
-        const budgetItemArray = Object.values(budget).flat();
-        for (let i = 0; i < budgetItemArray.length; i++) {
-            if (budgetItemArray[i].item_id === newTransactionData.item_id) {
-                sectionName = budgetItemArray[i].section as keyof Budget;
-                break;
-            }
-        }
-        if (!sectionName) {
-            console.error("Item not found in budget sections.");
-            return;
-        }
-        console.log(sectionName)
-        setBudget(prev => ({
-            ...prev,
-            [sectionName]: prev[sectionName].map((item: BudgetItem) =>
-                item.item_id === newTransactionData.item_id
-                    ? { ...item, transactions: [...item.transactions, newTransactionData] }
-                    : item
-            )
-        }));
     };
 
     /**
@@ -183,9 +184,140 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
             newBudget = updatedBudget;
             return updatedBudget;
         })
-
         return newBudget;
     }
+
+    /**
+     * Adds a transaction to a budget item within the Context Budget
+     * @param newTransactionData 
+     */
+    const addTransaction = (newTransactionData: Transaction) => {
+        let sectionName: keyof Budget | undefined;
+        const budgetItemArray = Object.values(budget).flat();
+        for (let i = 0; i < budgetItemArray.length; i++) {
+            if (budgetItemArray[i].item_id === newTransactionData.item_id) {
+                sectionName = budgetItemArray[i].section as keyof Budget;
+                break;
+            }
+        }
+        if (!sectionName) {
+            console.error("Item not found in budget sections.");
+            return;
+        }
+        setBudget(prev => ({
+            ...prev,
+            [sectionName]: prev[sectionName].map((item: BudgetItem) =>
+                item.item_id === newTransactionData.item_id
+                    ? { ...item, transactions: [...item.transactions, newTransactionData] }
+                    : item
+            )
+        }));
+    };
+
+    /**
+     * Updates an existing transaction within the Context Budget
+     * @param updatedTransactionData 
+     */
+    const updateTransaction = (updatedTransactionData: Transaction) => {
+        let sectionName: keyof Budget | undefined;
+        const budgetItemArray = Object.values(budget).flat();
+        for (let i = 0; i < budgetItemArray.length; i++) {
+            if (budgetItemArray[i].item_id === updatedTransactionData.item_id) {
+                sectionName = budgetItemArray[i].section as keyof Budget;
+                break;
+            }
+        }
+        if (!sectionName) {
+            console.error("Item not found in budget sections.");
+            return;
+        }
+        setBudget(prev => ({
+            ...prev,
+            [sectionName]: prev[sectionName].map((item: BudgetItem) =>
+                item.item_id === updatedTransactionData.item_id
+                    ? {
+                        ...item,
+                        transactions: item.transactions.map((transaction: Transaction) =>
+                            transaction.transaction_id === updatedTransactionData.transaction_id
+                                ? updatedTransactionData
+                                : transaction
+                        )
+                    }
+                    : item
+            )
+        }));
+        updateTransactions(updatedTransactionData)
+    };
+
+    /**
+     * Updates an existing transaction within the Context Budget
+     * @param updatedTransactionData 
+     */
+    const deleteTransaction = (deletedTransactionData: Transaction) => {
+        let sectionName: keyof Budget | undefined;
+        const budgetItemArray = Object.values(budget).flat();
+        for (let i = 0; i < budgetItemArray.length; i++) {
+            if (budgetItemArray[i].item_id === deletedTransactionData.item_id) {
+                sectionName = budgetItemArray[i].section as keyof Budget;
+                break;
+            }
+        }
+        if (!sectionName) {
+            console.error("Item not found in budget sections.");
+            return;
+        }
+        setBudget(prev => ({
+            ...prev,
+            [sectionName]: prev[sectionName].map((item: BudgetItem) =>
+                item.item_id === deletedTransactionData.item_id
+                    ? {
+                        ...item,
+                        transactions: item.transactions.filter((transaction: Transaction) =>
+                            transaction.transaction_id !== deletedTransactionData.transaction_id
+                        )
+                    }
+                    : item
+            )
+        }));
+        deleteFromTransactions(deletedTransactionData);
+    };
+
+    /**
+     * Adds a transaction to the Transactions array and keeps it in descending order
+     * @param newTransactionData 
+     */
+    const addToTransactions = (newTransactionData: Transaction) => {
+        let newTransactions = transactions;
+        newTransactions.push(newTransactionData)
+        newTransactions = newTransactions.sort((a, b) => Date.parse(b.date!) - Date.parse(a.date!));
+        setTransactions(newTransactions);
+    };
+
+    /**
+     * Adds a transaction to the Transactions array and keeps it in descending order
+     * @param newTransactionData 
+     */
+    const updateTransactions = (newTransactionData: Transaction) => {
+        let newTransactions = transactions.map((transaction: Transaction) =>
+            transaction.transaction_id === newTransactionData.transaction_id
+                ? newTransactionData
+                : transaction
+        )
+        newTransactions = newTransactions.sort((a, b) => Date.parse(b.date!) - Date.parse(a.date!));
+        setTransactions(newTransactions);
+    };
+
+    /**
+     * Adds a transaction to the Transactions array and keeps it in descending order
+     * @param newTransactionData 
+     */
+    const deleteFromTransactions = (newTransactionData: Transaction) => {
+        let newTransactions = transactions.filter((transaction: Transaction) =>
+            transaction.transaction_id !== newTransactionData.transaction_id
+        )
+        newTransactions = newTransactions.sort((a, b) => Date.parse(b.date!) - Date.parse(a.date!));
+        setTransactions(newTransactions);
+    };
 
     /**
      * Checks if passed date is within the same month as the context budget
@@ -209,13 +341,20 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
 
     const contextValue: BudgetContextType = {
         budget,
+        transactions,
+        categories,
         curMonth,
         curYear,
-        addTransaction,
         addBudgetItem,
         updateBudgetItem,
         removeBudgetItem,
         dataToBudget,
+        addTransaction,
+        addToTransactions,
+        updateTransaction,
+        updateTransactions,
+        deleteTransaction,
+        deleteFromTransactions,
         isCurrentMonth,
         isCurrentYear
     };

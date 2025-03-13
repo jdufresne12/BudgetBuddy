@@ -26,12 +26,13 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     backgroundColor: colors.secondary,
+    marginVertical: 10,
   },
   budgetContainer: {
     flexDirection: 'row',
     flex: 1,
     alignSelf: 'center',
-    marginTop: 20,
+    marginTop: 10,
     width: '90%',
     backgroundColor: 'white',
     borderRadius: 10,

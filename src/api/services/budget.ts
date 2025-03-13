@@ -41,7 +41,7 @@ export interface GetCategoriesData {
 }
 
 export interface Category {
-    item_id: number | undefined;
+    item_id: string;
     name: string;
 }
 

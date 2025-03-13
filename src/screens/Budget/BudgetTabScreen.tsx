@@ -108,7 +108,6 @@ function BudgetTabScreen(): React.JSX.Element {
 
     const calculateTotalIncome = (sections: any): number => {
         sections = Object.values(sections);
-        console.log(sections)
         return sections.reduce((totalIncome: number, budgetItems: BudgetItem[]) => {
             const sectionIncome = budgetItems?.reduce((itemTotal: number, item: BudgetItem) => {
                 if (item.type?.toLowerCase() === "income") {

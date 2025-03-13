@@ -20,14 +20,16 @@ import AmountInput from './AmountInput';
 import { CreateTransactionData, Transaction, transactionAPI } from '../api/services/transaction';
 import { budgetAPI, Category } from '../api/services/budget';
 
-interface AddTransactionModalProps {
+interface EditTransactionModalProps {
     isVisible: boolean;
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>;
+    transaction: Transaction;
 }
 
-const AddTransactionModal = ({ isVisible, setIsVisible }: AddTransactionModalProps) => {
+const EditTransactionModal = ({ isVisible, setIsVisible, transaction }: EditTransactionModalProps) => {
     const { userData } = useAuth();
-    const { categories, isCurrentMonth, isCurrentYear, addTransaction, addToTransactions } = useBudget();
+    const { categories, isCurrentMonth, isCurrentYear,
+        updateTransaction, updateTransactions, deleteTransaction, deleteFromTransactions } = useBudget();
 
     const [amount, setAmount] = useState<number>(0);
     const [itemType, setItemType] = useState<string>('expense');
@@ -44,6 +46,33 @@ const AddTransactionModal = ({ isVisible, setIsVisible }: AddTransactionModalPro
         const formattedDate = date?.toISOString()?.split("T")[0] ?? null;
         setDate(formattedDate);
         hideDatePicker();
+    };
+
+    useEffect(() => {
+        if (categories.length > 0) {
+            setAmount(transaction.amount);
+            setItemType(transaction.type);
+            setDescription(transaction.description);
+            setCategory(findMatchingCategory(transaction.item_id?.toString()!));
+            setDate(transaction.date);
+        }
+    }, [isVisible, categories])
+
+    function findMatchingCategory(item_id: string): Category {
+        const foundCategory = categories.find(category => category.item_id === item_id);
+        return foundCategory
+            ? { name: foundCategory.name, item_id: foundCategory.item_id }
+            : { name: "", item_id: "0" };
+    }
+
+    async function resetData() {
+        setAmount(0);
+        setItemType('expense');
+        setDescription('');
+        setDate(getCurrentDate());
+        setCategory({ name: "", item_id: "0" })
+        setDescriptionError(null);
+        setDateError(null);
     };
 
     const handleCancel = async () => {
@@ -69,61 +98,41 @@ const AddTransactionModal = ({ isVisible, setIsVisible }: AddTransactionModalPro
         setDateError(null);
     };
 
-    const handleAddTransaction = async () => {
-        let isValid = true;
-
-        if (description === null || description === '') {
-            isValid = false;
-            setDescriptionError("Please add a brief description of this transaction (e.g. \"Lunch\" \"Groceries\"");
-        } else
-            setDescriptionError(null)
-
-        if (date !== null && date !== '') {
-            if (!isValidDateFormat(date || '')) {
-                isValid = false;
-                setDateError("Date must be in YYYY-MM-DD format");
-            }
-        } else if (date === null || date === '') {
-            isValid = false;
-            setDateError("Date must be in YYYY-MM-DD format");
-        } else
-            setDateError(null)
-
-        if (isValid) {
-            try {
-                const newTransaction: CreateTransactionData = {
-                    user_id: userData?.user_id,
-                    item_id: parseInt(category.item_id),
-                    description: description,
-                    amount: amount,
-                    type: itemType,
-                    date: date
-                };
-
-                const response = await transactionAPI.createTransaction(newTransaction);
-                if (response) {
-                    if (isCurrentMonth(date!) && isCurrentYear(date!)) {
-                        addTransaction(response);
-                    }
-                    addToTransactions(response);
-                }
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setIsVisible(false);
-                await resetData();
+    const handleUpdate = async () => {
+        const transactionData = {
+            user_id: userData?.user_id,
+            item_id: parseInt(category.item_id),
+            transaction_id: transaction.transaction_id,
+            description: description,
+            amount: amount,
+            type: itemType,
+            date: date
+        }
+        const response = await transactionAPI.updateTransaction(transactionData);
+        if (response) {
+            if (isCurrentMonth(transactionData.date!) && isCurrentYear(transactionData.date!)) {
+                updateTransaction(transactionData);
+            } else {
+                updateTransactions(transactionData)
             }
         }
+        setIsVisible(false);
     };
 
-    async function resetData() {
-        setAmount(0);
-        setItemType('expense');
-        setDescription('');
-        setDate(getCurrentDate());
-        setCategory({ name: "", item_id: "0" })
-        setDescriptionError(null);
-        setDateError(null);
+    const handleDelete = async () => {
+        const deleteTransactionData = {
+            user_id: userData?.user_id,
+            transaction_id: transaction.transaction_id
+        }
+        const response = await transactionAPI.deleteTransaction(deleteTransactionData);
+        if (response) {
+            if (isCurrentMonth(transaction.date!) && isCurrentYear(transaction.date!)) {
+                deleteTransaction(transaction);
+            } else {
+                deleteFromTransactions(transaction)
+            }
+        }
+        setIsVisible(false);
     };
 
     return (
@@ -236,10 +245,17 @@ const AddTransactionModal = ({ isVisible, setIsVisible }: AddTransactionModalPro
 
                 <View style={styles.buttonContainer}>
                     <TouchableOpacity
-                        style={styles.addButton}
-                        onPress={handleAddTransaction}
+                        style={[styles.addButton, styles.updateButton]}
+                        onPress={handleUpdate}
                     >
-                        <Text style={styles.addButtonText}>Add Transaction</Text>
+                        <Text style={styles.addButtonText}>Update</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.addButton, styles.deleteButton]}
+                        onPress={handleDelete}
+                    >
+                        <Text style={styles.addButtonText}>Delete</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -384,7 +400,6 @@ const styles = StyleSheet.create({
     buttonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        marginTop: 20,
     },
     updateButton: {
         width: '45%',
@@ -443,4 +458,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default AddTransactionModal;
+export default EditTransactionModal;

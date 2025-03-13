@@ -55,7 +55,6 @@ const LoginScreen = () => {
         try {
             setIsLoading(true);
             const response = await authApi.login({ email, password });
-            console.log("here")
             await contextLogin(response.access_token, response.user_data);
         } catch (error) {
             const errorMessage = error instanceof Error

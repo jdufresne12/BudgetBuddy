@@ -26,6 +26,10 @@ export interface DeleteTransactionData {
     transaction_id: number | null;
 }
 
+export interface GetAllTransactionsData {
+    user_id: number | undefined;
+}
+
 export interface GetMonthsTransactionsData {
     user_id: number | undefined;
     month: number;
@@ -66,7 +70,7 @@ export const transactionAPI = {
         }
     },
 
-    getAllTransactions: async (data: number) => {
+    getAllTransactions: async (data: GetAllTransactionsData) => {
         try {
             const response = await apiClient.post<Transaction[]>
                 ('/transaction/get_all_transactions', data)

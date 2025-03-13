@@ -128,8 +128,6 @@ const EditBudgetItem = ({ isVisible, setIsVisible, section, budgetItem, setBudge
                 if (response) {
                     if (curMonth === currentMonth && curYear === currentYear) {
                         const updatedBudget = updateBudgetItem(data);
-                        console.log("budgetItemData")
-                        console.log(updatedBudget)
 
                         setBudgetState((prevState) => ({
                             ...prevState,

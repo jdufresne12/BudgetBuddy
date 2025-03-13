@@ -51,9 +51,7 @@ function ViewTransactionsModal({ isVisible, setIsVisible, section, budgetItems }
                         onPress={() => setIsVisible(false)}
                     >
                         <View style={styles.modalView}>
-                            <TouchableOpacity onPress={() => console.log(budgetItems)}>
-                                <Text style={styles.header}>{section}</Text>
-                            </TouchableOpacity>
+                            <Text style={styles.header}>{section}</Text>
 
                             {budgetItems?.length > 0
                                 ? (

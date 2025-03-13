@@ -29,7 +29,6 @@ function AddTransaction({ }: AddTransactionProps): React.JSX.Element {
             <AddTransactionModal
                 isVisible={showTransactionModal}
                 setIsVisible={(setShowTransactionModal)}
-                handleUpdateItem={() => console.log('update')}
             />
         </View>
     )

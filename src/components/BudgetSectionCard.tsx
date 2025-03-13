@@ -46,7 +46,6 @@ function BudgetSectionCard({ section, budgetItems, setBudgetState, currentMonth,
     <TouchableOpacity
       style={styles.container}
       activeOpacity={1}
-      onLongPress={() => console.log("setShowDeleteSectionModal(true)")}
       delayLongPress={500}
     >
       <View style={{ flexDirection: 'row' }}>

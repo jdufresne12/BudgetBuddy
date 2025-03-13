@@ -20,8 +20,6 @@ export const userApi = {
     createUser: async (userData: CreateUserData) => {
         try {
             const response = await apiClient.post<CreateUserResponse>('/users', userData);
-            console.log("RESPONSE")
-            console.log(response)
             return response.data;
         } catch (error) {
             throw handleApiError(error);
