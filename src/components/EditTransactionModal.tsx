@@ -40,6 +40,8 @@ const EditTransactionModal = ({ isVisible, setIsVisible, transaction }: EditTran
     const [dateError, setDateError] = useState<string | null>(null);
     const [isDatePickerVisible, setDatePickerVisibility] = useState<boolean>(false);
 
+    const prevTransactionData: Transaction = transaction;
+
     const showDatePicker = () => { setDatePickerVisibility(true) };
     const hideDatePicker = () => { setDatePickerVisibility(false) };
     const handleConfirm = (date: Date) => {
@@ -112,9 +114,10 @@ const EditTransactionModal = ({ isVisible, setIsVisible, transaction }: EditTran
         if (response) {
             if (isCurrentMonth(transactionData.date!) && isCurrentYear(transactionData.date!)) {
                 updateTransaction(transactionData);
-            } else {
-                updateTransactions(transactionData)
+            } else if (isCurrentMonth(prevTransactionData.date!) && isCurrentYear(prevTransactionData.date!)) {
+                deleteTransaction(prevTransactionData);
             }
+            updateTransactions(transactionData)
         }
         setIsVisible(false);
     };

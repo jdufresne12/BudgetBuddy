@@ -246,7 +246,6 @@ export const BudgetProvider: React.FC<BudgetProviderProps> = ({ children }) => {
                     : item
             )
         }));
-        updateTransactions(updatedTransactionData)
     };
 
     /**
